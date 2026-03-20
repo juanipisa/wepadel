@@ -33,4 +33,12 @@ public class CategoryServiceImpl implements CategoryService {
         }
         return categoryRepository.createCategory(newCategoryId, description);
     }
+
+    public Optional<Category> updateCategory(int categoryId, String description) {
+        return categoryRepository.updateCategory(categoryId, description);
+    }
+
+    public boolean deleteCategory(int categoryId) {
+        return categoryRepository.deleteCategory(categoryId);
+    }
 }

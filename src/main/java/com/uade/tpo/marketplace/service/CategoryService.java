@@ -10,4 +10,6 @@ public interface CategoryService {
     public ArrayList<Category> getCategories();
     public Optional<Category> getCategoryById(int categoryId);
     public Category createCategory(int newCategoryId, String description) throws CategoryDuplicateException;
+    public Optional<Category> updateCategory(int categoryId, String description);
+    public boolean deleteCategory(int categoryId);
 }

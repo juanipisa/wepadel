@@ -28,4 +28,14 @@ public class CategoryRepository{
             this.categories.add(newCategory);
             return newCategory;
         }
+
+        public Optional<Category> updateCategory(int categoryId, String newDescription) {
+            Optional<Category> category = getCategoryById(categoryId);
+            category.ifPresent(c -> c.setDescription(newDescription));
+            return category;
+        }
+
+        public boolean deleteCategory(int categoryId) {
+            return this.categories.removeIf(c -> c.getId() == categoryId);
+        }
 }
