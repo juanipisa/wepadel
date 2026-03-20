@@ -4,12 +4,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.entity.Category;
+import com.uade.tpo.marketplace.entity.dto.CategoryRequest;
+import com.uade.tpo.marketplace.exceptions.CategoryDuplicateException;
 import com.uade.tpo.marketplace.service.CategoryService;
 
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.Optional;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,22 +21,29 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("categories")
 public class CategoryController {
-    
+    private CategoryService categoryService;
+
+    public CategoryController() {
+        this.categoryService = new CategoryService();
+    }
+
     @GetMapping
     public ArrayList<Category> getCategories() {
-        CategoryService categoryService = new CategoryService();
         return categoryService.getCategories();
     }
 
-    @GetMapping("{categoryId}")
-    public Category getCategoryById(@PathVariable int categoryId) {
-        CategoryService categoryService = new CategoryService();
-        return categoryService.getCategoryById(categoryId);
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<Category> getCategoryById(@PathVariable int categoryId) {
+        Optional<Category> category = categoryService.getCategoryById(categoryId);
+        if (category.isPresent()) {
+            return ResponseEntity.ok(category.get());
+        } 
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
-    public String createCategory(@RequestBody int categoryId) {
-        CategoryService categoryService = new CategoryService();
-        return categoryService.createCategory(categoryId);
+    public ResponseEntity<Object> createCategory(@RequestBody CategoryRequest categoryRequest) throws CategoryDuplicateException {
+        Category result = categoryService.createCategory(categoryRequest.getId(), categoryRequest.getDescription());
+        return ResponseEntity.created(URI.create("/categories/" + result.getId())).body(result);
     }
 }
