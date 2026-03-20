@@ -4,8 +4,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
 
+import org.springframework.stereotype.Repository;
+
 import com.uade.tpo.marketplace.entity.Category;
 
+@Repository
 public class CategoryRepository{
     public ArrayList<Category> categories = new ArrayList<>(
         Arrays.asList(Category.builder().description("Paletas").id(1).build(),
