@@ -7,11 +7,13 @@ import com.uade.tpo.marketplace.entity.Category;
 import com.uade.tpo.marketplace.entity.dto.CategoryRequest;
 import com.uade.tpo.marketplace.exceptions.CategoryDuplicateException;
 import com.uade.tpo.marketplace.service.CategoryService;
+import com.uade.tpo.marketplace.service.CategoryServiceImpl;
 
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,11 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 @RestController
 @RequestMapping("categories")
 public class CategoryController {
+    @Autowired
     private CategoryService categoryService;
-
-    public CategoryController() {
-        this.categoryService = new CategoryService();
-    }
 
     @GetMapping
     public ArrayList<Category> getCategories() {
