@@ -11,6 +11,7 @@ import com.uade.tpo.marketplace.service.CategoryServiceImpl;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +30,12 @@ public class CategoryController {
     private CategoryService categoryService;
 
     @GetMapping
-    public ArrayList<Category> getCategories() {
+    public List<Category> getCategories() {
         return categoryService.getCategories();
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Category> getCategoryById(@PathVariable int categoryId) {
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId) {
         Optional<Category> category = categoryService.getCategoryById(categoryId);
         if (category.isPresent()) {
             return ResponseEntity.ok(category.get());
@@ -44,25 +45,25 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<Object> createCategory(@RequestBody CategoryRequest categoryRequest) throws CategoryDuplicateException {
-        Category result = categoryService.createCategory(categoryRequest.getId(), categoryRequest.getDescription());
+        Category result = categoryService.createCategory(categoryRequest.getDescription());
         return ResponseEntity.created(URI.create("/categories/" + result.getId())).body(result);
     }
 
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<Category> updateCategory(@PathVariable int categoryId, @RequestBody CategoryRequest categoryRequest) {
-        Optional<Category> category = categoryService.updateCategory(categoryId, categoryRequest.getDescription());
-        if (category.isPresent()) {
-            return ResponseEntity.ok(category.get());
-        }
-        return ResponseEntity.noContent().build();
-    }
+    //@PutMapping("/{categoryId}")
+    // public ResponseEntity<Category> updateCategory(@PathVariable int categoryId, @RequestBody CategoryRequest categoryRequest) {
+    //     Optional<Category> category = categoryService.updateCategory(categoryId, categoryRequest.getDescription());
+    //     if (category.isPresent()) {
+    //         return ResponseEntity.ok(category.get());
+    //     }
+    //     return ResponseEntity.noContent().build();
+    // }
 
-    @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Object> deleteCategory(@PathVariable int categoryId) {
-        boolean deleted = categoryService.deleteCategory(categoryId);
-        if (deleted) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.noContent().build();
-    }
+    //@DeleteMapping("/{categoryId}")
+    // public ResponseEntity<Object> deleteCategory(@PathVariable Long categoryId) {
+    //     boolean deleted = categoryService.deleteCategory(categoryId);
+    //     if (deleted) {
+    //         return ResponseEntity.ok().build();
+    //     }
+    //     return ResponseEntity.noContent().build();
+    // }
 }
