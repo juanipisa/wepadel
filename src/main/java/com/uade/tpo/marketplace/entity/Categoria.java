@@ -1,30 +1,31 @@
 package com.uade.tpo.marketplace.entity;
 
-import lombok.Builder;
-import lombok.Data;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Data;
 
 @Data
 @Entity
-public class Category {
+public class Categoria {
 
-    public Category() {
+    public Categoria() {
     }
 
-    public Category(String description) {
-        this.description = description;
+    public Categoria(String descripcion) {
+        this.descripcion = descripcion;
     }
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "description", nullable = false, unique = true)
-    private String description;
+    @Column(name = "descripcion", nullable = false, unique = true)
+    private String descripcion;
+
+    @Column(name = "habilitada", nullable = false)
+    private boolean habilitada = false;
 
 }
-
