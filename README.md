@@ -194,15 +194,15 @@ frontend/
 
 ---
 
-## 🗺️ Roadmap del proyecto
+# 🗺️ Roadmap y tareas del proyecto
 
-El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto.
+El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto. Anotarse a las tareas que van a realizar. 
 
 ### ✅ Entrega #1 — Modelo de datos y entidades `(vence 07/04)`
-- [x] Entidades JPA creadas y mapeadas
-- [x] Base de datos conectada (MySQL)
-- [x] Endpoints básicos funcionando
-- [ ] DER (Diagrama Entidad-Relación)
+- [x] Entidades JPA creadas y mapeadas - Juani
+- [x] Base de datos conectada (MySQL) - Juani
+- [x] Endpoints básicos funcionando - Juani
+- [ ] DER (Diagrama Entidad-Relación) - Palo
 - [ ] Diagrama UML de clases
 
 ### 🔐 Entrega #2 — Seguridad con JWT `(vence 22/04)`
@@ -237,11 +237,10 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Refactorizar componentes para usar el store global
 - [ ] Integrar middleware si es necesario
 
----
 
-## 🐛 Bugs y pendientes del backend
+## 🐛 Bugs y pendientes
 
-- [ ] Crear entidades pendientes en base al nuevo DER y actualizar las existentes (Palo)
+- [ ] Crear entidades pendientes en base al nuevo DER y actualizar las existentes - Palo
 - [ ] Crear carrito automáticamente al registrar un usuario
 - [ ] Descontar stock al confirmar una compra
 - [ ] Limpiar el carrito después de una compra exitosa
