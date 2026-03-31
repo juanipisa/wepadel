@@ -1,4 +1,4 @@
-# 🏓 Marketplace de Pádel
+# 🏓 E-commerce de Pádel
 E-commerce fullstack de productos de pádel. Backend en Spring Boot + MySQL, frontend en React con Redux en el marco de la materia Aplicaciones Interactivas, UADE.
 
 ## 🎯 Objetivo del proyecto
