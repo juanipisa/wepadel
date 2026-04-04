@@ -9,13 +9,11 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplace.entity.Compra;
 import com.uade.tpo.marketplace.entity.CompraItem;
-import com.uade.tpo.marketplace.entity.DatosFacturacion;
 import com.uade.tpo.marketplace.entity.EstadoCompra;
 import com.uade.tpo.marketplace.entity.dto.CompraRequest;
 import com.uade.tpo.marketplace.repository.CarritoItemRepository;
 import com.uade.tpo.marketplace.repository.CompraItemRepository;
 import com.uade.tpo.marketplace.repository.CompraRepository;
-import com.uade.tpo.marketplace.repository.DatosFacturacionRepository;
 import com.uade.tpo.marketplace.repository.ProductoRepository;
 
 @Service
