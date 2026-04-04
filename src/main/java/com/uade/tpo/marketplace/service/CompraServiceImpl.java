@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplace.entity.Compra;
 import com.uade.tpo.marketplace.entity.CompraItem;
-import com.uade.tpo.marketplace.entity.EstadoCompra;
+import com.uade.tpo.marketplace.entity.EstadoOrdenEnum;
 import com.uade.tpo.marketplace.entity.dto.CompraRequest;
 import com.uade.tpo.marketplace.repository.CarritoItemRepository;
 import com.uade.tpo.marketplace.repository.CompraItemRepository;
@@ -62,7 +62,7 @@ public class CompraServiceImpl implements CompraService {
         compra.setCp(request.getCp());
         compra.setMontoEnvio(request.getMontoEnvio());
         compra.setMontoFinal(montoProductos + request.getMontoEnvio());
-        compra.setEstado(EstadoCompra.PENDIENTE);
+        compra.setEstado(EstadoOrdenEnum.PENDIENTE);
         compra.setFecha(LocalDateTime.now());
         Compra savedCompra = compraRepository.save(compra);
 

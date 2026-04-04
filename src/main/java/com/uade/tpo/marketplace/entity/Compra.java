@@ -39,7 +39,7 @@ public class Compra {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "estado", nullable = false)
-    private EstadoCompra estado;
+    private EstadoOrdenEnum estado;
 
     @Column(name = "fecha", nullable = false)
     private LocalDateTime fecha;

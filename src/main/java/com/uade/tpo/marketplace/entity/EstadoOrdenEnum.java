@@ -1,9 +1,6 @@
 package com.uade.tpo.marketplace.entity;
 
-public enum EstadoCompra {
-    PENDIENTE,
+public enum EstadoOrdenEnum {
     CONFIRMADA,
-    ENVIADA,
-    ENTREGADA,
     CANCELADA
 }
