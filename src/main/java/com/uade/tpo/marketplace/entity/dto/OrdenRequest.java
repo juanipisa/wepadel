@@ -1,18 +1,13 @@
 package com.uade.tpo.marketplace.entity.dto;
 
+import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
 public class OrdenRequest {
     private Long usuarioId;
-    private Long carritoId;
     private String direccion;
     private String cp;
-    private Double montoEnvio;
-    private String nroTarjeta;
-    private String vencimiento;
-    private String dni;
-    private String cvv;
-    private String nombreTitular;
-    private int cuotas;
+    private BigDecimal montoEnvio;
+    private Boolean usaPuntos;
 }
