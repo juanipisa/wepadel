@@ -1,6 +1,6 @@
 package com.uade.tpo.marketplace.entity;
 
-public enum CategoriasEnum {
+public enum CategoriaEnum {
     PALETAS,
     ACCESORIOS,
     PELOTAS

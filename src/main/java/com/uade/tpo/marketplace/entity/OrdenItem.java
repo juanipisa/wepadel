@@ -1,5 +1,7 @@
 package com.uade.tpo.marketplace.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,13 +11,14 @@ import lombok.Data;
 
 @Data
 @Entity
-public class CompraItem {
+public class OrdenItem {
 
-    public CompraItem() {
+    public OrdenItem() {
     }
 
-    public CompraItem(Long compraId, Long productoId, int cantidad, Double precioUnitario) {
-        this.compraId = compraId;
+    // Se crea automáticamente cuando se confirma la orden
+    public OrdenItem(Long ordenId, Long productoId, int cantidad, BigDecimal precioUnitario) {
+        this.ordenId = ordenId;
         this.productoId = productoId;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
@@ -25,8 +28,8 @@ public class CompraItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "compra_id", nullable = false)
-    private Long compraId;
+    @Column(name = "orden_id", nullable = false)
+    private Long ordenId;
 
     @Column(name = "producto_id", nullable = false)
     private Long productoId;
@@ -34,7 +37,8 @@ public class CompraItem {
     @Column(name = "cantidad", nullable = false)
     private int cantidad;
 
+    // Se guarda para historial permanente, aunque el precio del producto después cambie
     @Column(name = "precio_unitario", nullable = false)
-    private Double precioUnitario;
+    private BigDecimal precioUnitario;
 
 }

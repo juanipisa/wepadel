@@ -7,10 +7,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.uade.tpo.marketplace.entity.Compra;
-import com.uade.tpo.marketplace.entity.CompraItem;
+import com.uade.tpo.marketplace.entity.Orden;
+import com.uade.tpo.marketplace.entity.OrdenItem;
 import com.uade.tpo.marketplace.entity.EstadoOrdenEnum;
-import com.uade.tpo.marketplace.entity.dto.CompraRequest;
+import com.uade.tpo.marketplace.entity.dto.OrdenRequest;
 import com.uade.tpo.marketplace.repository.CarritoItemRepository;
 import com.uade.tpo.marketplace.repository.CompraItemRepository;
 import com.uade.tpo.marketplace.repository.CompraRepository;
@@ -34,29 +34,29 @@ public class CompraServiceImpl implements CompraService {
     @Autowired
     private ProductoRepository productoRepository;
 
-    public Optional<Compra> getCompraById(Long compraId) {
+    public Optional<Orden> getCompraById(Long compraId) {
         return compraRepository.findById(compraId);
     }
 
-    public List<Compra> getComprasByUsuarioId(Long usuarioId) {
+    public List<Orden> getComprasByUsuarioId(Long usuarioId) {
         return compraRepository.findByUsuarioId(usuarioId);
     }
 
-    public Compra createCompra(CompraRequest request) {
-        List<CompraItem> items = carritoItemRepository.findByCarritoId(request.getCarritoId())
+    public Orden createCompra(OrdenRequest request) {
+        List<OrdenItem> items = carritoItemRepository.findByCarritoId(request.getCarritoId())
                 .stream()
                 .map(carritoItem -> {
                     Double precio = productoRepository.findById(carritoItem.getProductoId())
                             .map(p -> p.getPrecio())
                             .orElse(0.0);
-                    return new CompraItem(null, carritoItem.getProductoId(), carritoItem.getCantidad(), precio);
+                    return new OrdenItem(null, carritoItem.getProductoId(), carritoItem.getCantidad(), precio);
                 }).toList();
 
         Double montoProductos = items.stream()
                 .mapToDouble(i -> i.getPrecioUnitario() * i.getCantidad())
                 .sum();
 
-        Compra compra = new Compra();
+        Orden compra = new Orden();
         compra.setUsuarioId(request.getUsuarioId());
         compra.setDireccion(request.getDireccion());
         compra.setCp(request.getCp());
@@ -64,7 +64,7 @@ public class CompraServiceImpl implements CompraService {
         compra.setMontoFinal(montoProductos + request.getMontoEnvio());
         compra.setEstado(EstadoOrdenEnum.PENDIENTE);
         compra.setFecha(LocalDateTime.now());
-        Compra savedCompra = compraRepository.save(compra);
+        Orden savedCompra = compraRepository.save(compra);
 
         items.forEach(item -> {
             item.setCompraId(savedCompra.getId());

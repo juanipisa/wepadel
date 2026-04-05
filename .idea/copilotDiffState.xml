@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CopilotDiffPersistence">
+    <option name="pendingDiffs">
+      <map>
+        <entry key="$PROJECT_DIR$/src/main/java/com/uade/tpo/marketplace/entity/CarritoItem.java">
+          <value>
+            <PendingDiffInfo>
+              <option name="filePath" value="$PROJECT_DIR$/src/main/java/com/uade/tpo/marketplace/entity/CarritoItem.java" />
+              <option name="originalContent" value="package com.uade.tpo.marketplace.entity;&#10;&#10;import jakarta.persistence.Column;&#10;import jakarta.persistence.Entity;&#10;import jakarta.persistence.GeneratedValue;&#10;import jakarta.persistence.GenerationType;&#10;import jakarta.persistence.Id;&#10;import jakarta.persistence.JoinColumn;&#10;import jakarta.persistence.ManyToOne;&#10;import lombok.Data;&#10;&#10;@Data&#10;@Entity&#10;public class CarritoItem {&#10;&#10;    public CarritoItem() {&#10;    }&#10;&#10;    public CarritoItem(Long carritoId, Long productoId, int cantidad) {&#10;        this.carritoId = carritoId;&#10;        this.productoId = productoId;&#10;        this.cantidad = cantidad;&#10;    }&#10;&#10;    @Id&#10;    @GeneratedValue(strategy = GenerationType.IDENTITY)&#10;    private Long id;&#10;&#10;    @Column(name = &quot;carrito_id&quot;, nullable = false)&#10;    private Long carritoId;&#10;&#10;    @Column(name = &quot;producto_id&quot;, nullable = false)&#10;    private Long productoId;&#10;&#10;    @Column(name = &quot;cantidad&quot;, nullable = false)&#10;    private int cantidad;&#10;&#10;}&#10;" />
+              <option name="updatedContent" value="package com.uade.tpo.marketplace.entity;&#10;&#10;import jakarta.persistence.Column;&#10;import jakarta.persistence.Entity;&#10;import jakarta.persistence.GeneratedValue;&#10;import jakarta.persistence.GenerationType;&#10;import jakarta.persistence.Id;&#10;import jakarta.persistence.JoinColumn;&#10;import jakarta.persistence.ManyToOne;&#10;import lombok.Data;&#10;&#10;@Data&#10;@Entity&#10;public class CarritoItem {&#10;&#10;    public CarritoItem() {&#10;    }&#10;&#10;    public CarritoItem(Long carritoId, Long productoId, int cantidad) {&#10;        this.carritoId = carritoId;&#10;        this.productoId = productoId;&#10;        this.cantidad = cantidad;&#10;    }&#10;&#10;    @Id&#10;    @GeneratedValue(strategy = GenerationType.IDENTITY)&#10;    private Long id;&#10;&#10;    @Column(name = &quot;carrito_id&quot;, nullable = false)&#10;    private Long carritoId;&#10;&#10;    @Column(name = &quot;producto_id&quot;, nullable = false)&#10;    private Long productoId;&#10;&#10;    @Column(name = &quot;cantidad&quot;, nullable = false)&#10;    private int cantidad;&#10;&#10;}" />
+            </PendingDiffInfo>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

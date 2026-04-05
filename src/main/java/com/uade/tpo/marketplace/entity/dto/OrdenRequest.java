@@ -3,7 +3,7 @@ package com.uade.tpo.marketplace.entity.dto;
 import lombok.Data;
 
 @Data
-public class CompraRequest {
+public class OrdenRequest {
     private Long usuarioId;
     private Long carritoId;
     private String direccion;
