@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.marketplace.entity.Orden;
 import com.uade.tpo.marketplace.entity.dto.OrdenRequest;
-import com.uade.tpo.marketplace.service.CompraService;
+import com.uade.tpo.marketplace.service.OrdenService;
 
 @RestController
 @RequestMapping("compras")
 public class CompraController {
 
     @Autowired
-    private CompraService compraService;
+    private OrdenService compraService;
 
     @GetMapping("/{compraId}")
     public ResponseEntity<Orden> getCompraById(@PathVariable Long compraId) {

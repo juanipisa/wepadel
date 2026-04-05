@@ -35,12 +35,14 @@ public class StockController {
 
     @PostMapping
     public ResponseEntity<Object> createStock(@RequestBody StockRequest stockRequest) {
+        //TODO: Validar que el usuario autenticado es ADMIN
         Stock result = stockService.createStock(stockRequest.getProductoId(), stockRequest.getCantidad());
         return ResponseEntity.created(URI.create("/stocks/producto/" + result.getProductoId())).body(result);
     }
 
     @PutMapping("/producto/{productoId}")
     public ResponseEntity<Stock> updateStock(@PathVariable Long productoId, @RequestBody StockRequest stockRequest) {
+        //TODO: Validar que el usuario autenticado es ADMIN
         Optional<Stock> stock = stockService.updateStock(productoId, stockRequest);
         if (stock.isPresent()) {
             return ResponseEntity.ok(stock.get());

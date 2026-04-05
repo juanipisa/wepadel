@@ -41,12 +41,14 @@ public class ProductoController {
 
     @PostMapping
     public ResponseEntity<Object> createProducto(@RequestBody ProductoRequest productRequest) {
+        //TODO: Validar que el usuario autenticado es ADMIN
         Producto result = productoService.createProducto(productRequest);
         return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
     }
 
     @PutMapping("/{productoId}")
     public ResponseEntity<Producto> updateProducto(@PathVariable Long productoId, @RequestBody ProductoRequest productRequest) {
+        //TODO: Validar que el usuario autenticado es ADMIN
         Optional<Producto> product = productoService.updateProducto(productoId, productRequest);
         if (product.isPresent()) {
             return ResponseEntity.ok(product.get());
