@@ -1,6 +1,5 @@
 package com.uade.tpo.marketplace.service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.marketplace.entity.Carrito;
 import com.uade.tpo.marketplace.entity.CarritoItem;
+import com.uade.tpo.marketplace.entity.dto.CarritoItemRequest;
 import com.uade.tpo.marketplace.repository.CarritoItemRepository;
 import com.uade.tpo.marketplace.repository.CarritoRepository;
 
@@ -21,39 +21,51 @@ public class CarritoServiceImpl implements CarritoService {
     @Autowired
     private CarritoItemRepository carritoItemRepository;
 
-    public Optional<Carrito> getCarritoById(Long carritoId) {
-        return carritoRepository.findById(carritoId).map(carrito -> {
-            if (carrito.getCreadoEn().isBefore(LocalDateTime.now().minusWeeks(1))) {
-                resetCarrito(carritoId);
-                carrito.setCreadoEn(LocalDateTime.now());
-                carritoRepository.save(carrito);
-            }
-            return carrito;
-        });
+    public Optional<Carrito> getCarritoByUsuarioId(Long usuarioId) {
+        return carritoRepository.findByUsuarioId(usuarioId);
     }
 
     public Carrito createCarrito(Long usuarioId) {
         return carritoRepository.save(new Carrito(usuarioId));
     }
 
-    public List<CarritoItem> getItems(Long carritoId) {
-        return carritoItemRepository.findByCarritoId(carritoId);
+    public List<CarritoItem> getItems(Long usuarioId) {
+        Optional<Carrito> carrito = carritoRepository.findByUsuarioId(usuarioId);
+        if (carrito.isPresent()) {
+            return carritoItemRepository.findByCarritoId(carrito.get().getId());
+        }
+        return List.of();
     }
 
-    public CarritoItem addItem(Long carritoId, Long productoId, int cantidad) {
+    public CarritoItem addItem(Long usuarioId, CarritoItemRequest request) {
+        Optional<Carrito> carrito = carritoRepository.findByUsuarioId(usuarioId);
+        if (carrito.isEmpty()) {
+            throw new RuntimeException("Carrito no encontrado para usuario: " + usuarioId);
+        }
+
+        Long carritoId = carrito.get().getId();
         List<CarritoItem> items = carritoItemRepository.findByCarritoId(carritoId);
+
+        // Si el producto ya existe en el carrito, incrementar cantidad
         Optional<CarritoItem> existing = items.stream()
-                .filter(i -> i.getProductoId().equals(productoId))
+                .filter(i -> i.getProductoId().equals(request.getProductoId()))
                 .findFirst();
+
         if (existing.isPresent()) {
-            existing.get().setCantidad(existing.get().getCantidad() + cantidad);
+            existing.get().setCantidad(existing.get().getCantidad() + request.getCantidad());
             return carritoItemRepository.save(existing.get());
         }
-        return carritoItemRepository.save(new CarritoItem(carritoId, productoId, cantidad));
+
+        return carritoItemRepository.save(new CarritoItem(carritoId, request.getProductoId(), request.getCantidad()));
     }
 
-    public boolean removeItem(Long carritoId, Long productoId) {
-        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carritoId);
+    public boolean removeItem(Long usuarioId, Long productoId) {
+        Optional<Carrito> carrito = carritoRepository.findByUsuarioId(usuarioId);
+        if (carrito.isEmpty()) {
+            return false;
+        }
+
+        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.get().getId());
         return items.stream()
                 .filter(i -> i.getProductoId().equals(productoId))
                 .findFirst()
@@ -63,8 +75,15 @@ public class CarritoServiceImpl implements CarritoService {
                 }).orElse(false);
     }
 
-    public void resetCarrito(Long carritoId) {
-        carritoItemRepository.deleteAll(carritoItemRepository.findByCarritoId(carritoId));
+    public void deleteCarrito(Long usuarioId) {
+        Optional<Carrito> carrito = carritoRepository.findByUsuarioId(usuarioId);
+        if (carrito.isPresent()) {
+            // Eliminar todos los items del carrito
+            List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.get().getId());
+            carritoItemRepository.deleteAll(items);
+            // Eliminar el carrito
+            carritoRepository.delete(carrito.get());
+        }
     }
 
 }

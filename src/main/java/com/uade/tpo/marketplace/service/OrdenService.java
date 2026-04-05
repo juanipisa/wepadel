@@ -6,8 +6,15 @@ import java.util.Optional;
 import com.uade.tpo.marketplace.entity.Orden;
 import com.uade.tpo.marketplace.entity.dto.OrdenRequest;
 
-public interface CompraService {
-    public Optional<Orden> getCompraById(Long compraId);
-    public List<Orden> getComprasByUsuarioId(Long usuarioId);
-    public Orden createCompra(OrdenRequest request);
+public interface OrdenService {
+    public Optional<Orden> getOrdenById(Long ordenId);
+    public List<Orden> getOrdenesByUsuarioId(Long usuarioId);
+    public Orden createOrden(OrdenRequest request);
+    public Optional<Orden> cancelarOrden(Long ordenId);
+    //TODO: Cuál es la fórmula exacta para calcular puntos_generados?
+    //TODO: Quién crea los OrdenItem? En qué momento?
+    //TODO: Qué validaciones se hacen antes de confirmar la orden?
+    //TODO: Se actualiza stock al crear orden?
+    //TODO: Se suma puntos al usuario al confirmar orden?
+    //TODO: Cuáles son las excepciones que puede lanzar?
 }
