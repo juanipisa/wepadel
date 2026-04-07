@@ -17,6 +17,7 @@ public class ProductoServiceImpl implements ProductoService {
     private ProductoRepository productoRepository;
 
     public List<Producto> getProductos() {
+        //TODO: Filtrar solo productos habilitados (estaHabilitado = true)
         return productoRepository.findAll();
     }
 
@@ -25,16 +26,18 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public Producto createProducto(ProductoRequest request) {
-        return productoRepository.save(new Producto(request.getNombre(), request.getDescripcion(), request.getPrecio(), request.getCategoriaId()));
+        //TODO: Validar que el usuario es ADMIN
+        return productoRepository.save(new Producto(request.getDescripcion(), request.getPrecio(),
+                request.getCategoria()));
     }
 
     public Optional<Producto> updateProducto(Long productoId, ProductoRequest request) {
+        //TODO: Validar que el usuario es ADMIN
         return productoRepository.findById(productoId).map(producto -> {
-            if (request.getNombre() != null) producto.setNombre(request.getNombre());
             if (request.getDescripcion() != null) producto.setDescripcion(request.getDescripcion());
             if (request.getPrecio() != null) producto.setPrecio(request.getPrecio());
-            if (request.getCategoriaId() != null) producto.setCategoriaId(request.getCategoriaId());
-            if (request.getHabilitado() != null) producto.setHabilitado(request.getHabilitado());
+            if (request.getEstaHabilitado() != null) producto.setEstaHabilitado(request.getEstaHabilitado());
+            // Nota: categoría NO se puede cambiar según el DER
             return productoRepository.save(producto);
         });
     }

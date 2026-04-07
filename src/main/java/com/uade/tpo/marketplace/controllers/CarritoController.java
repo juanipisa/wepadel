@@ -19,39 +19,49 @@ import com.uade.tpo.marketplace.entity.dto.CarritoItemRequest;
 import com.uade.tpo.marketplace.service.CarritoService;
 
 @RestController
-@RequestMapping("carritos")
+@RequestMapping("usuarios/{usuarioId}/carrito")
 public class CarritoController {
 
     @Autowired
     private CarritoService carritoService;
 
-    @GetMapping("/{carritoId}")
-    public ResponseEntity<Carrito> getCarritoById(@PathVariable Long carritoId) {
-        Optional<Carrito> carrito = carritoService.getCarritoById(carritoId);
+    @GetMapping
+    public ResponseEntity<Carrito> getCarritoByUsuarioId(@PathVariable Long usuarioId) {
+        Optional<Carrito> carrito = carritoService.getCarritoByUsuarioId(usuarioId);
         if (carrito.isPresent()) {
             return ResponseEntity.ok(carrito.get());
         }
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/{carritoId}/items")
-    public ResponseEntity<List<CarritoItem>> getItems(@PathVariable Long carritoId) {
-        return ResponseEntity.ok(carritoService.getItems(carritoId));
+    // Obtener items del carrito del usuario
+    @GetMapping("/items")
+    public ResponseEntity<List<CarritoItem>> getItems(@PathVariable Long usuarioId) {
+        return ResponseEntity.ok(carritoService.getItems(usuarioId));
     }
 
-    @PostMapping("/{carritoId}/items")
-    public ResponseEntity<CarritoItem> addItem(@PathVariable Long carritoId, @RequestBody CarritoItemRequest request) {
-        CarritoItem item = carritoService.addItem(carritoId, request.getProductoId(), request.getCantidad());
+    // Agregar item al carrito del usuario
+    @PostMapping("/items")
+    public ResponseEntity<CarritoItem> addItem(@PathVariable Long usuarioId, @RequestBody CarritoItemRequest request) {
+        CarritoItem item = carritoService.addItem(usuarioId, request);
         return ResponseEntity.ok(item);
     }
 
-    @DeleteMapping("/{carritoId}/items/{productoId}")
-    public ResponseEntity<Object> removeItem(@PathVariable Long carritoId, @PathVariable Long productoId) {
-        boolean removed = carritoService.removeItem(carritoId, productoId);
+    // Eliminar producto del carrito del usuario
+    @DeleteMapping("/items/{productoId}")
+    public ResponseEntity<Object> removeItem(@PathVariable Long usuarioId, @PathVariable Long productoId) {
+        boolean removed = carritoService.removeItem(usuarioId, productoId);
         if (removed) {
             return ResponseEntity.ok().build();
         }
         return ResponseEntity.noContent().build();
+    }
+
+    // Borrar carrito completo del usuario
+    @DeleteMapping
+    public ResponseEntity<Object> deleteCarrito(@PathVariable Long usuarioId) {
+        carritoService.deleteCarrito(usuarioId);
+        return ResponseEntity.ok().build();
     }
 
 }

@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.marketplace.entity.RolEnum;
 import com.uade.tpo.marketplace.entity.Usuario;
 import com.uade.tpo.marketplace.entity.dto.UsuarioRequest;
 import com.uade.tpo.marketplace.exceptions.UsuarioDuplicateException;
@@ -26,11 +27,18 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
-        List<Usuario> usuarios = usuarioRepository.findAll();
-        if (usuarios.stream().anyMatch(u -> u.getMail().equals(request.getMail()))) {
-            throw new UsuarioDuplicateException();
+        // Validar que email no exista si se proporciona
+        if (request.getMail() != null) {
+            if (usuarioRepository.findByMail(request.getMail()).isPresent()) {
+                throw new UsuarioDuplicateException();
+            }
+            // Si tiene mail, es usuario REGISTRADO
+            return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(),
+                    request.getPassword(), request.getRol()));
+        } else {
+            // Si no tiene mail, es usuario INVITADO (constructor sin parámetros)
+            return usuarioRepository.save(new Usuario());
         }
-        return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(), request.getPassword()));
     }
 
     public Optional<Usuario> updateUsuario(Long usuarioId, UsuarioRequest request) {
@@ -38,6 +46,7 @@ public class UsuarioServiceImpl implements UsuarioService {
             if (request.getNombreApellido() != null) usuario.setNombreApellido(request.getNombreApellido());
             if (request.getMail() != null) usuario.setMail(request.getMail());
             if (request.getPassword() != null) usuario.setPassword(request.getPassword());
+            if (request.getRol() != null) usuario.setRol(request.getRol());
             return usuarioRepository.save(usuario);
         });
     }

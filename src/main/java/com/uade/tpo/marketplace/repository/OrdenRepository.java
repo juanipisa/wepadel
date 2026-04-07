@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import com.uade.tpo.marketplace.entity.Orden;
 
 @Repository
-public interface CompraRepository extends JpaRepository<Orden, Long> {
+public interface OrdenRepository extends JpaRepository<Orden, Long> {
     List<Orden> findByUsuarioId(Long usuarioId);
 }
+

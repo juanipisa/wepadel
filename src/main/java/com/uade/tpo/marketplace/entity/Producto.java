@@ -1,7 +1,11 @@
 package com.uade.tpo.marketplace.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,30 +18,28 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String nombre, String descripcion, Double precio, Long categoriaId) {
-        this.nombre = nombre;
+    public Producto(String descripcion, BigDecimal precio, CategoriaEnum categoria) {
         this.descripcion = descripcion;
         this.precio = precio;
-        this.categoriaId = categoriaId;
+        this.categoria = categoria;
+        this.estaHabilitado = true;
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre", nullable = false)
-    private String nombre;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "categoria", nullable = false)
+    private CategoriaEnum categoria;
 
     @Column(name = "descripcion")
     private String descripcion;
 
     @Column(name = "precio", nullable = false)
-    private Double precio;
+    private BigDecimal precio;
 
-    @Column(name = "categoria_id", nullable = false)
-    private Long categoriaId;
-
-    @Column(name = "habilitado", nullable = false)
-    private boolean habilitado = false;
+    @Column(name = "estaHabilitado", nullable = false)
+    private Boolean estaHabilitado = true;
 
 }

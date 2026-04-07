@@ -13,20 +13,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.uade.tpo.marketplace.entity.Compra;
-import com.uade.tpo.marketplace.entity.dto.CompraRequest;
-import com.uade.tpo.marketplace.service.CompraService;
+import com.uade.tpo.marketplace.entity.Orden;
+import com.uade.tpo.marketplace.entity.dto.OrdenRequest;
+import com.uade.tpo.marketplace.service.OrdenService;
 
 @RestController
 @RequestMapping("compras")
 public class CompraController {
 
     @Autowired
-    private CompraService compraService;
+    private OrdenService compraService;
 
     @GetMapping("/{compraId}")
-    public ResponseEntity<Compra> getCompraById(@PathVariable Long compraId) {
-        Optional<Compra> compra = compraService.getCompraById(compraId);
+    public ResponseEntity<Orden> getCompraById(@PathVariable Long compraId) {
+        Optional<Orden> compra = compraService.getCompraById(compraId);
         if (compra.isPresent()) {
             return ResponseEntity.ok(compra.get());
         }
@@ -34,13 +34,13 @@ public class CompraController {
     }
 
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Compra>> getComprasByUsuario(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<Orden>> getComprasByUsuario(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(compraService.getComprasByUsuarioId(usuarioId));
     }
 
     @PostMapping
-    public ResponseEntity<Object> createCompra(@RequestBody CompraRequest compraRequest) {
-        Compra result = compraService.createCompra(compraRequest);
+    public ResponseEntity<Object> createCompra(@RequestBody OrdenRequest compraRequest) {
+        Orden result = compraService.createCompra(compraRequest);
         return ResponseEntity.created(URI.create("/compras/" + result.getId())).body(result);
     }
 

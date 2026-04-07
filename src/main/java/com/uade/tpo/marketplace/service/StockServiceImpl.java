@@ -25,9 +25,10 @@ public class StockServiceImpl implements StockService {
     }
 
     public Optional<Stock> updateStock(Long productoId, StockRequest request) {
+        //TODO: Validar que el usuario es ADMIN
         return stockRepository.findByProductoId(productoId).map(stock -> {
             stock.setCantidad(request.getCantidad());
-            stock.setLastUpdated(LocalDateTime.now());
+            stock.setUltima_modificacion(LocalDateTime.now());
             return stockRepository.save(stock);
         });
     }

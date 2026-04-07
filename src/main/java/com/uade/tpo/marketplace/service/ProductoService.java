@@ -11,4 +11,5 @@ public interface ProductoService {
     public Optional<Producto> getProductoById(Long productoId);
     public Producto createProducto(ProductoRequest request);
     public Optional<Producto> updateProducto(Long productoId, ProductoRequest request);
+    //TODO: Debo filtrar productos por estaHabilitado en getProductos()?
 }
