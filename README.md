@@ -2,17 +2,26 @@
 E-commerce fullstack de productos de pádel. Backend en Spring Boot + MySQL, frontend en React con Redux en el marco de la materia Aplicaciones Interactivas, UADE.
 
 ## 🎯 Objetivo del proyecto
-Construir una plataforma de venta online de productos de pádel donde los usuarios pueden navegar el catálogo sin registrarse, pero necesitan una cuenta para agregar productos al carrito y realizar compras. El sistema mantiene el carrito persistente entre sesiones y lo resetea automáticamente luego de 7 días.
+Construir una plataforma de venta online de productos de pádel donde los usuarios pueden navegar el catálogo, agregar productos al carrito y realizar compras.
 
 ## 🧠 Lógica de negocio
-- Usuarios invitados pueden ver productos y categorías sin autenticarse.
-- Usuarios registrados pueden gestionar su carrito y realizar compras.
-- Al registrar un usuario se debe crear automáticamente su carrito asociado.
-- El carrito persiste entre sesiones. Si tiene más de 7 días desde su creación, se vacía automáticamente al consultarlo.
-- Al agregar un producto ya existente al carrito, se suma la cantidad en lugar de duplicar el ítem.
-- Al confirmar una compra, durante el proceso de compra, se registra un snapshot del precio unitario de cada producto en ese momento, de modo que cambios futuros de precio no afecten el historial.
-- Los productos y categorías tienen un flag "habilitado" para activarlos sin eliminarlos.
-- El estado de una compra sigue el ciclo: `PENDIENTE → CONFIRMADA → ENVIADA → ENTREGADA` (o `CANCELADA`).
+- Los usuarios invitados pueden ver y comprar productos; los registrados acceden a su perfil, historial de compras y beneficios de puntos.
+- Si un invitado agrega productos al carrito y luego se registra, esos productos se transfieren automáticamente a su nueva cuenta.
+- Si un usuario invitado no se registra, su entidad y carrito se eliminan permanentemente al cerrar la página.
+- El administrador tiene credenciales únicas, proporcionadas por el equipo técnico, una vista exclusiva para gestionar stock y precios, y no puede realizar compras ni tener un carrito.
+- Al registrar un usuario cliente, se crea automáticamente su carrito; para los invitados, se crea al agregar el primer producto.
+- El carrito del usuario registrado persiste por 7 días; si no se concreta la compra en ese plazo, se vacía automáticamente.
+- El subtotal del carrito se actualiza en tiempo real según el precio actual de los productos en la base de datos.
+- Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
+- Exclusivo para clientes registrados; se suman puntos al confirmar una orden y se restan si se utilizan como parte de pago o si la orden se cancela.
+- La orden se genera únicamente al hacer clic en "Pagar"; si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
+- Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
+- Al confirmar una compra, se registra el precio unitario del momento en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
+- Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario (email) solo dentro de las primeras 24 horas.
+- Al confirmarse una cancelación, la orden pasa a estado CANCELADA, el stock de los productos se restaura y los puntos generados se eliminan.
+- Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
+- Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
+- Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos de la venta sin borrarlos del sistema.
 
 ## 🏗️ Arquitectura
 
@@ -36,18 +45,7 @@ src/
 ```
 
 ### Frontend *(a construir)*
-SPA (Single Page Application) con React + Vite. Estado global manejado con Redux Toolkit. Comunicación con el backend vía fetch/axios con manejo de promesas y asincronismo.
-
-```
-frontend/
-├── src/
-│   ├── components/     # Componentes reutilizables
-│   ├── pages/          # Vistas principales (Home, Producto, Carrito, etc.)
-│   ├── store/          # Redux: slices, reducers, middleware
-│   ├── services/       # Llamadas al backend (fetch/axios)
-│   └── router/         # React Router DOM
-```
-
+TBC
 ---
 
 ## 🗄️ Base de datos
@@ -60,149 +58,65 @@ frontend/
 > ⚠️ Las credenciales están commiteadas temporalmente. Una vez que todos las tengan configuradas localmente, sacarlas del repo y usar variables de entorno.
 
 ### Entidades
+USUARIO
+SISTEMA_PUNTOS
+CARRITO
+CARRITO_ITEM
+ORDEN
+ORDEN_ITEM
+PRODUCTO
+STOCK
 
-| Entidad | Descripción |
-|---|---|
-| `Usuario` | Nombre, mail (único), password, rol |
-| `Rol` | Rol del usuario (ej: USER, ADMIN) *(a definir)* |
-| `Categoria` | Descripción (única), flag habilitada |
-| `Producto` | Nombre, descripción, precio, categoría, flag habilitado |
-| `Stock` | Producto, cantidad, fecha de última actualización |
-| `Carrito` | Usuario, fecha de creación |
-| `CarritoItem` | Carrito, producto, cantidad |
-| `Compra` | Usuario, dirección, CP, montos, estado, fecha |
-| `CompraItem` | Compra, producto, cantidad, precioUnitario (snapshot) |
-| `DatosFacturacion` | Datos de tarjeta asociados a una compra |
-
-**EstadoCompra:** `PENDIENTE` · `CONFIRMADA` · `ENVIADA` · `ENTREGADA` · `CANCELADA`
+* El diagrama entidad relación se encuentra documentado en nuestra carpeta de drive *
 
 ---
 
 ## 📡 Endpoints
+# Recurso: Usuarios
+- `GET /usuarios`
+- `GET /usuarios/{usuarioId}`
+- `POST /usuarios/invitado`
+- `POST /usuarios/registrado`
+- `PUT /usuarios/{usuarioId}` 
 
-> Base URL: `http://localhost:8080`
+# Recurso: Carrito
+- `GET /usuarios/{usuarioId}/carrito`
+- `GET /usuarios/{usuarioId}/carrito/items` 
+- `POST /usuarios/{usuarioId}/carrito/items` 
+- `DELETE /usuarios/{usuarioId}/carrito/items/{productoId}` 
+- `DELETE /usuarios/{usuarioId}/carrito` 
 
-### Usuarios — `/usuarios`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/usuarios` | Lista todos los usuarios |
-| GET | `/usuarios/{id}` | Obtiene un usuario por ID |
-| POST | `/usuarios` | Crea un usuario nuevo |
-| PUT | `/usuarios/{id}` | Actualiza datos de un usuario |
+# Recurso: Ordenes
+- `GET /usuarios/{usuarioId}/ordenes`
+- `GET /usuarios/{usuarioId}/ordenes/{ordenId}` 
+- `POST /usuarios/{usuarioId}/ordenes`
+- `PUT /usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` 
 
-**Body POST/PUT:**
-```json
-{ "nombreApellido": "Juan Pérez", "mail": "juan@mail.com", "password": "1234" }
-```
+# Recurso: Productos
+- `GET /productos` 
+- `GET /productos/{productoId}` 
+- `POST /productos` 
+- `PUT /productos/{productoId}` 
 
----
+# Recurso: Stocks
+- `GET /stocks/producto/{productoId}`
+- `POST /stocks` 
+- `PUT /stocks/producto/{productoId}` 
 
-### Categorías — `/categorias`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/categorias` | Lista todas las categorías |
-| GET | `/categorias/{id}` | Obtiene una categoría por ID |
-| POST | `/categorias` | Crea una categoría nueva |
-| PUT | `/categorias/{id}` | Actualiza descripción y/o estado |
-
-**Body POST:** `{ "descripcion": "Paletas" }`  
-**Body PUT:** `{ "descripcion": "Paletas profesionales", "habilitada": true }`
-
-> Si ya existe una categoría con la misma descripción → `400 Bad Request`.
-
----
-
-### Productos — `/productos`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/productos` | Lista todos los productos |
-| GET | `/productos/{id}` | Obtiene un producto por ID |
-| POST | `/productos` | Crea un producto nuevo |
-| PUT | `/productos/{id}` | Actualiza datos de un producto |
-
-**Body POST/PUT:**
-```json
-{
-  "nombre": "Paleta Pro X",
-  "descripcion": "Paleta de fibra de carbono",
-  "precio": 45000.00,
-  "categoriaId": 1,
-  "habilitado": true
-}
-```
-
----
-
-### Stock — `/stocks`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/stocks/producto/{productoId}` | Consulta stock de un producto |
-| POST | `/stocks` | Crea el registro de stock |
-| PUT | `/stocks/producto/{productoId}` | Actualiza cantidad en stock |
-
-**Body POST/PUT:** `{ "productoId": 1, "cantidad": 100 }`
-
----
-
-### Carrito — `/carritos`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/carritos/{id}` | Obtiene el carrito (resetea si expiró) |
-| GET | `/carritos/{id}/items` | Lista los ítems del carrito |
-| POST | `/carritos/{id}/items` | Agrega un producto al carrito |
-| DELETE | `/carritos/{id}/items/{productoId}` | Elimina un producto del carrito |
-
-**Body POST items:** `{ "productoId": 3, "cantidad": 2 }`
-
----
-
-### Compras — `/compras`
-| Método | Path | Descripción |
-|---|---|---|
-| GET | `/compras/{id}` | Obtiene una compra por ID |
-| GET | `/compras/usuario/{usuarioId}` | Lista compras de un usuario |
-| POST | `/compras` | Confirma una compra desde el carrito |
-
-**Body POST:**
-```json
-{
-  "usuarioId": 1, "carritoId": 1,
-  "direccion": "Av. Corrientes 1234", "cp": "1043",
-  "montoEnvio": 2500.00,
-  "nroTarjeta": "4111111111111111", "vencimiento": "12/27",
-  "dni": "35123456", "cvv": "123",
-  "nombreTitular": "Juan Pérez", "cuotas": 3
-}
-```
-
----
-
-## ⚙️ Stack
-
-| Tecnología | Rol |
-|---|---|
-| Java 17+ | Lenguaje backend |
-| Spring Boot | Framework base |
-| Spring Data JPA + Hibernate | ORM y acceso a datos |
-| Spring Security + JWT | Autenticación y autorización *(a implementar)* |
-| MySQL 8 | Base de datos relacional |
-| Lombok | Reduce boilerplate (getters/setters) |
-| Maven | Build y dependencias |
-| React + Vite | Framework frontend *(a construir)* |
-| React Router DOM | Routing del frontend *(a construir)* |
-| Redux Toolkit | Estado global del frontend *(a construir)* |
-
----
+# Recurso: Compras
+- `GET /compras/{compraId}` 
+- `GET /compras/usuario/{usuarioId}` 
+- `POST /compras` 
 
 # 🗺️ Roadmap y tareas del proyecto
 
 El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto. Anotarse a las tareas que van a realizar. 
 
 ### ✅ Entrega #1 — Modelo de datos y entidades `(vence 07/04)`
-- [x] Entidades JPA creadas y mapeadas - Juani
-- [x] Base de datos conectada (MySQL) - Juani
-- [x] Endpoints básicos funcionando - Juani
-- [ ] DER (Diagrama Entidad-Relación) - Palo
+- [x] Entidades JPA creadas y mapeadas 
+- [x] Base de datos conectada (MySQL) 
+- [x] Endpoints básicos funcionando 
+- [x] DER (Diagrama Entidad-Relación) 
 - [ ] Diagrama UML de clases
 
 ### 🔐 Entrega #2 — Seguridad con JWT `(vence 22/04)`
@@ -240,8 +154,8 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 
 ## 🐛 Bugs y pendientes
 
-- [ ] Crear entidades pendientes en base al nuevo DER y actualizar las existentes - Palo
-- [ ] Crear carrito automáticamente al registrar un usuario
+- [ ] Actualizar documentación de endpoints de forma detallada en readme
+- [ ] Crear UML
 - [ ] Descontar stock al confirmar una compra
 - [ ] Limpiar el carrito después de una compra exitosa
 - [ ] Agregar `DELETE /categorias/{id}`
