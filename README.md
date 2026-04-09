@@ -58,55 +58,67 @@ TBC
 > ⚠️ Las credenciales están commiteadas temporalmente. Una vez que todos las tengan configuradas localmente, sacarlas del repo y usar variables de entorno.
 
 ### Entidades
-USUARIO
-SISTEMA_PUNTOS
-CARRITO
-CARRITO_ITEM
-ORDEN
-ORDEN_ITEM
-PRODUCTO
-STOCK
+- USUARIO
+- SISTEMA_PUNTOS
+- CARRITO
+- CARRITO_ITEM
+- ORDEN
+- ORDEN_ITEM
+- PRODUCTO
+- STOCK
 
-* El diagrama entidad relación se encuentra documentado en nuestra carpeta de drive *
+El diagrama entidad relación se encuentra documentado en nuestra carpeta de drive
 
 ---
 
 ## 📡 Endpoints
-# Recurso: Usuarios
-- `GET /usuarios`
-- `GET /usuarios/{usuarioId}`
-- `POST /usuarios/invitado`
-- `POST /usuarios/registrado`
-- `PUT /usuarios/{usuarioId}` 
+### Recurso: Usuarios
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/usuarios` | Obtener todos los usuarios |
+| `GET` | `/usuarios/{usuarioId}` | Obtener usuario por ID |
+| `POST` | `/usuarios/invitado` | Crear usuario invitado (sin body) |
+| `POST` | `/usuarios/registrado` | Crear usuario registrado (con datos completos) |
+| `PUT` | `/usuarios/{usuarioId}` | Actualizar datos de un usuario |
 
-# Recurso: Carrito
-- `GET /usuarios/{usuarioId}/carrito`
-- `GET /usuarios/{usuarioId}/carrito/items` 
-- `POST /usuarios/{usuarioId}/carrito/items` 
-- `DELETE /usuarios/{usuarioId}/carrito/items/{productoId}` 
-- `DELETE /usuarios/{usuarioId}/carrito` 
+### Recurso: Carrito
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario |
+| `GET` | `/usuarios/{usuarioId}/carrito/items` | Obtener items del carrito |
+| `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar item al carrito |
+| `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar un producto del carrito |
+| `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar el carrito completo |
 
-# Recurso: Ordenes
-- `GET /usuarios/{usuarioId}/ordenes`
-- `GET /usuarios/{usuarioId}/ordenes/{ordenId}` 
-- `POST /usuarios/{usuarioId}/ordenes`
-- `PUT /usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` 
+### Recurso: Órdenes
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/usuarios/{usuarioId}/ordenes` | Obtener historial de órdenes del usuario |
+| `GET` | `/usuarios/{usuarioId}/ordenes/{ordenId}` | Obtener una orden por ID |
+| `POST` | `/usuarios/{usuarioId}/ordenes` | Crear orden (confirmar pago) |
+| `PUT` | `/usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` | Cancelar una orden (dentro de las 24hs) |
 
-# Recurso: Productos
-- `GET /productos` 
-- `GET /productos/{productoId}` 
-- `POST /productos` 
-- `PUT /productos/{productoId}` 
+### Recurso: Productos
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/productos` | Obtener todos los productos |
+| `GET` | `/productos/{productoId}` | Obtener producto por ID |
+| `POST` | `/productos` | Crear producto *(requiere ADMIN)* |
+| `PUT` | `/productos/{productoId}` | Actualizar producto *(requiere ADMIN)* |
 
-# Recurso: Stocks
-- `GET /stocks/producto/{productoId}`
-- `POST /stocks` 
-- `PUT /stocks/producto/{productoId}` 
+### Recurso: Stocks
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/stocks/producto/{productoId}` | Obtener stock de un producto |
+| `POST` | `/stocks` | Crear stock para un producto *(requiere ADMIN)* |
+| `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto *(requiere ADMIN)* |
 
-# Recurso: Compras
-- `GET /compras/{compraId}` 
-- `GET /compras/usuario/{usuarioId}` 
-- `POST /compras` 
+### Recurso: Compras
+| Método | Endpoint | Descripción |
+|--------|----------|-------------|
+| `GET` | `/compras/{compraId}` | Obtener compra por ID |
+| `GET` | `/compras/usuario/{usuarioId}` | Obtener compras de un usuario |
+| `POST` | `/compras` | Registrar una nueva compra |
 
 # 🗺️ Roadmap y tareas del proyecto
 
