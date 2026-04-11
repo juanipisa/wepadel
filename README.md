@@ -113,8 +113,6 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 |--------|----------|-------------|-----|
 | `GET` | `/usuarios` | Listar todos los usuarios registrados | ADMINISTRADOR |
 | `GET` | `/usuarios/{usuarioId}` | Obtener usuario por ID | ADMINISTRADOR / CLIENTE |
-| `POST` | `/usuarios/invitado` | Crear usuario invitado (sin body) | — |
-| `POST` | `/usuarios/registrado` | Registrar cliente y crear carrito automáticamente | — |
 | `PUT` | `/usuarios/{usuarioId}` | Actualizar datos del usuario | ADMINISTRADOR / CLIENTE |
 
 ### Recurso: Sistema de Puntos
@@ -207,13 +205,14 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 ## 🐛 Bugs y pendientes
 
 - [ ] Crear UML
-- [ ] Actualizar endpoints en base a nueva definición
+- [ ] Actualizar lógica de endpoints en base a nueva definición
 - [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
 - [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
 - [ ] Crear excepciones
 - [ ] Integración JWT
 - [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
 - [ ] Revisar inyección de dependencias
+- [ ] Actualizar services con lógica de negocio
 
 ---
 
