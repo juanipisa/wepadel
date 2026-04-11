@@ -19,7 +19,7 @@ public class Stock {
     public Stock(Long productoId, int cantidad) {
         this.productoId = productoId;
         this.cantidad = cantidad;
-        this.ultima_modificacion = LocalDateTime.now();
+        this.ultimaModificacion = LocalDateTime.now();
     }
 
     @Id
@@ -33,6 +33,6 @@ public class Stock {
     private int cantidad;
 
     @Column(name = "ultima_modificacion", nullable = false)
-    private LocalDateTime ultima_modificacion;
+    private LocalDateTime ultimaModificacion;
 
 }

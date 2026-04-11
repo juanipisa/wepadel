@@ -28,7 +28,7 @@ public class StockServiceImpl implements StockService {
         //TODO: Validar que el usuario es ADMIN
         return stockRepository.findByProductoId(productoId).map(stock -> {
             stock.setCantidad(request.getCantidad());
-            stock.setUltima_modificacion(LocalDateTime.now());
+            stock.setUltimaModificacion(LocalDateTime.now());
             return stockRepository.save(stock);
         });
     }
