@@ -40,13 +40,6 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    // Crear usuario invitado (sin parámetros en body)
-    @PostMapping("/invitado")
-    public ResponseEntity<Object> createUsuarioInvitado() throws UsuarioDuplicateException {
-        Usuario result = usuarioService.createUsuario(new UsuarioRequest());
-        return ResponseEntity.created(URI.create("/usuarios/" + result.getId())).body(result);
-    }
-
     // Crear usuario registrado (con datos completos)
     @PostMapping("/registrado")
     public ResponseEntity<Object> createUsuarioRegistrado(@RequestBody UsuarioRequest usuarioRequest) throws UsuarioDuplicateException {
