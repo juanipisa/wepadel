@@ -54,7 +54,7 @@ La API queda disponible en `http://localhost:8080`. Las tablas se crean automát
 - Un usuario invitado necesita registrarse y crear un usuario para poder realizar la orden.
 - Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
 - Al confirmar una compra, se registra el precio unitario del momento en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
-- Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario (email) solo dentro de las primeras 24 horas.
+- Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario solo dentro de las primeras 24 horas.
 - Al confirmarse una cancelación, la orden pasa a estado CANCELADA, el stock de los productos se restaura y los puntos generados se eliminan.
 - Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
 - Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
