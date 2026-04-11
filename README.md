@@ -105,6 +105,7 @@ TBC
 - STOCK
 
 Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O_wKtDfw2Tl/view?usp=sharing
+
 ---
 
 ## 📡 Endpoints
@@ -206,13 +207,12 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 
 - [ ] Crear UML
 - [ ] Actualizar lógica de endpoints en base a nueva definición
-- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
 - [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
 - [ ] Crear excepciones
 - [ ] Integración JWT
 - [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
-- [ ] Revisar inyección de dependencias
 - [ ] Actualizar services con lógica de negocio
+- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
 
 ---
 
