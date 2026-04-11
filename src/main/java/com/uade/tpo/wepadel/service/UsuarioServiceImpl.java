@@ -26,7 +26,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.findById(usuarioId);
     }
 
-    public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
+    /*public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
         // Validar que email no exista si se proporciona
         if (usuarioRepository.findByMail(request.getMail()).isPresent()) {
             throw new UsuarioDuplicateException();
@@ -35,7 +35,7 @@ public class UsuarioServiceImpl implements UsuarioService {
         RolEnum rol = request.getRol() != null ? request.getRol() : RolEnum.CLIENTE;
         return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(),
                 request.getPassword(), rol));
-    }
+    }*/
 
     public Optional<Usuario> updateUsuario(Long usuarioId, UsuarioRequest request) {
         return usuarioRepository.findById(usuarioId).map(usuario -> {

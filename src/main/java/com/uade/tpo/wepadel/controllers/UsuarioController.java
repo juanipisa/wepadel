@@ -40,13 +40,6 @@ public class UsuarioController {
         return ResponseEntity.noContent().build();
     }
 
-    // Crear usuario registrado (con datos completos)
-    @PostMapping("/registrado")
-    public ResponseEntity<Object> createUsuarioRegistrado(@RequestBody UsuarioRequest usuarioRequest) throws UsuarioDuplicateException {
-        Usuario result = usuarioService.createUsuario(usuarioRequest);
-        return ResponseEntity.created(URI.create("/usuarios/" + result.getId())).body(result);
-    }
-
     @PutMapping("/{usuarioId}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long usuarioId, @RequestBody UsuarioRequest usuarioRequest) {
         Optional<Usuario> usuario = usuarioService.updateUsuario(usuarioId, usuarioRequest);
