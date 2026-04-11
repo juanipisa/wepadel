@@ -6,10 +6,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.uade.tpo.wepadel.entity.RolEnum;
 import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.dto.UsuarioRequest;
-import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
 
 @Service

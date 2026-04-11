@@ -110,7 +110,7 @@ El diagrama entidad relación se encuentra documentado en nuestra carpeta de dri
 | Método | Endpoint | Descripción |
 |--------|----------|-------------|
 | `GET` | `/stocks/producto/{productoId}` | Obtener stock de un producto |
-| `POST` | `/stocks` | Crear stock para un producto *(requiere ADMIN)* |
+| `POST` | `/stocks/producto/{productoId}` | Crear stock para un producto *(requiere ADMIN)* |
 | `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto *(requiere ADMIN)* |
 
 
