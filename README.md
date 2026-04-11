@@ -5,16 +5,16 @@ E-commerce fullstack de productos de pádel. Backend en Spring Boot + MySQL, fro
 Construir una plataforma de venta online de productos de pádel donde los usuarios pueden navegar el catálogo, agregar productos al carrito y realizar compras.
 
 ## 🧠 Lógica de negocio
-- Los usuarios invitados pueden ver y comprar productos; los registrados acceden a su perfil, historial de compras y beneficios de puntos.
+- Los usuarios invitados pueden ver y agregar productos al carrito (persistiendo en el frontend); los registrados acceden a su perfil, historial de compras y beneficios de puntos.
 - Si un invitado agrega productos al carrito y luego se registra, esos productos se transfieren automáticamente a su nueva cuenta.
-- Si un usuario invitado no se registra, su entidad y carrito se eliminan permanentemente al cerrar la página.
 - El administrador tiene credenciales únicas, proporcionadas por el equipo técnico, una vista exclusiva para gestionar stock y precios, y no puede realizar compras ni tener un carrito.
-- Al registrar un usuario cliente, se crea automáticamente su carrito; para los invitados, se crea al agregar el primer producto.
+- Al registrar un usuario cliente, se crea automáticamente su carrito; para los invitados, solamente persiste en el frontend.
 - El carrito del usuario registrado persiste por 7 días; si no se concreta la compra en ese plazo, se vacía automáticamente.
 - El subtotal del carrito se actualiza en tiempo real según el precio actual de los productos en la base de datos.
 - Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
 - Exclusivo para clientes registrados; se suman puntos al confirmar una orden y se restan si se utilizan como parte de pago o si la orden se cancela.
 - La orden se genera únicamente al hacer clic en "Pagar"; si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
+- Un usuario invitado necesita registrarse y crear un usuario para poder realizar la orden.
 - Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
 - Al confirmar una compra, se registra el precio unitario del momento en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
 - Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario (email) solo dentro de las primeras 24 horas.
