@@ -4,6 +4,43 @@ E-commerce fullstack de productos de pádel. Backend en Spring Boot + MySQL, fro
 ## 🎯 Objetivo del proyecto
 Construir una plataforma de venta online de productos de pádel donde los usuarios pueden navegar el catálogo, agregar productos al carrito y realizar compras.
 
+## 🚀 Cómo ejecutar el proyecto localmente
+
+### Requisitos previos
+- Java 17
+- MySQL 8
+
+### Pasos
+
+**1. Clonar el repositorio**
+```bash
+git clone https://github.com/juanipisa/wepadel.git
+cd wepadel
+```
+
+**2. Crear la base de datos**
+```sql
+CREATE DATABASE wepadel;
+```
+
+**3. Configurar credenciales en** `src/main/resources/application.properties`
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/wepadel
+spring.datasource.username=root
+spring.datasource.password=TU_PASSWORD
+```
+
+**4. Levantar el servidor**
+```bash
+# Mac/Linux
+./mvnw spring-boot:run
+
+# Windows
+mvnw.cmd spring-boot:run
+```
+
+La API queda disponible en `http://localhost:8080`. Las tablas se crean automáticamente al iniciar.
+
 ## 🧠 Lógica de negocio
 - Los usuarios invitados pueden ver y agregar productos al carrito (persistiendo en el frontend); los registrados acceden a su perfil, historial de compras y beneficios de puntos.
 - Si un invitado agrega productos al carrito y luego se registra, esos productos se transfieren automáticamente a su nueva cuenta.
@@ -67,44 +104,47 @@ TBC
 - PRODUCTO
 - STOCK
 
-El diagrama entidad relación se encuentra documentado en nuestra carpeta de drive
+Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O_wKtDfw2Tl/view?usp=sharing
 
 ---
 
 ## 📡 Endpoints
 ### Recurso: Usuarios
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/usuarios` | Obtener todos los usuarios |
-| `GET` | `/usuarios/{usuarioId}` | Obtener usuario por ID |
-| `POST` | `/usuarios/invitado` | Crear usuario invitado (sin body) |
-| `POST` | `/usuarios/registrado` | Crear usuario registrado (con datos completos) |
-| `PUT` | `/usuarios/{usuarioId}` | Actualizar datos de un usuario |
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/usuarios` | Listar todos los usuarios registrados | ADMINISTRADOR |
+| `GET` | `/usuarios/{usuarioId}` | Obtener usuario por ID | ADMINISTRADOR / CLIENTE |
+| `PUT` | `/usuarios/{usuarioId}` | Actualizar datos del usuario | ADMINISTRADOR / CLIENTE |
+
+### Recurso: Sistema de Puntos
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/usuarios/{usuarioId}/puntos` | Consultar saldo de puntos del usuario | CLIENTE |
 
 ### Recurso: Carrito
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario |
-| `GET` | `/usuarios/{usuarioId}/carrito/items` | Obtener items del carrito |
-| `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar item al carrito |
-| `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar un producto del carrito |
-| `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar el carrito completo |
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario | CLIENTE |
+| `GET` | `/usuarios/{usuarioId}/carrito/items` | Listar ítems del carrito | CLIENTE |
+| `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar producto o incrementar cantidad | CLIENTE |
+| `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar producto del carrito | CLIENTE |
+| `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar carrito completo | CLIENTE |
 
 ### Recurso: Órdenes
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/usuarios/{usuarioId}/ordenes` | Obtener historial de órdenes del usuario |
-| `GET` | `/usuarios/{usuarioId}/ordenes/{ordenId}` | Obtener una orden por ID |
-| `POST` | `/usuarios/{usuarioId}/ordenes` | Crear orden (confirmar pago) |
-| `PUT` | `/usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` | Cancelar una orden (dentro de las 24hs) |
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/usuarios/{usuarioId}/ordenes` | Listar órdenes del usuario | CLIENTE |
+| `GET` | `/usuarios/{usuarioId}/ordenes/{ordenId}` | Obtener detalle de una orden | CLIENTE |
+| `POST` | `/usuarios/{usuarioId}/ordenes` | Confirmar compra, generar orden y descontar stock | CLIENTE |
+| `PUT` | `/usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` | Cancelar orden dentro de las 24 horas | CLIENTE |
 
 ### Recurso: Productos
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/productos` | Obtener todos los productos |
-| `GET` | `/productos/{productoId}` | Obtener producto por ID |
-| `POST` | `/productos` | Crear producto *(requiere ADMIN)* |
-| `PUT` | `/productos/{productoId}` | Actualizar producto *(requiere ADMIN)* |
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/productos` | Listar productos habilitados | — |
+| `GET` | `/productos/{productoId}` | Obtener detalle de producto | — |
+| `POST` | `/productos` | Crear producto | ADMINISTRADOR |
+| `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
 
 ### Recurso: Stocks
 | Método | Endpoint | Descripción |
@@ -113,6 +153,11 @@ El diagrama entidad relación se encuentra documentado en nuestra carpeta de dri
 | `POST` | `/stocks/producto/{productoId}` | Crear stock para un producto *(requiere ADMIN)* |
 | `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto *(requiere ADMIN)* |
 
+### Recurso: Auth
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `POST` | `/auth/login` | Autenticar credenciales y devolver JWT | — |
+| `POST` | `/auth/register` | Registrar usuario y devolver token | — |
 
 # 🗺️ Roadmap y tareas del proyecto
 
@@ -160,13 +205,14 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 
 ## 🐛 Bugs y pendientes
 
-- [ ] Actualizar documentación de endpoints de forma detallada en readme
 - [ ] Crear UML
-- [ ] Descontar stock al confirmar una compra
-- [ ] Limpiar el carrito después de una compra exitosa
-- [ ] Agregar `DELETE /categorias/{id}`
-- [ ] Optimizar validación de duplicados (evitar `findAll()` en `Usuario` y `Categoria`)
-- [ ] Mover credenciales de DB a variables de entorno
+- [ ] Actualizar lógica de endpoints en base a nueva definición
+- [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
+- [ ] Crear excepciones
+- [ ] Integración JWT
+- [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
+- [ ] Actualizar services con lógica de negocio
+- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
 
 ---
 
