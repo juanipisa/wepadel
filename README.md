@@ -113,12 +113,6 @@ El diagrama entidad relación se encuentra documentado en nuestra carpeta de dri
 | `POST` | `/stocks` | Crear stock para un producto *(requiere ADMIN)* |
 | `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto *(requiere ADMIN)* |
 
-### Recurso: Compras
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/compras/{compraId}` | Obtener compra por ID |
-| `GET` | `/compras/usuario/{usuarioId}` | Obtener compras de un usuario |
-| `POST` | `/compras` | Registrar una nueva compra |
 
 # 🗺️ Roadmap y tareas del proyecto
 
