@@ -35,7 +35,7 @@ Controller → Service (interfaz + implementación) → Repository → MySQL
 ```
 src/
 └── main/
-    └── java/com/uade/tpo/marketplace/
+    └── java/com/uade/tpo/wepadel/
         ├── controllers/      # Endpoints REST (@RestController)
         ├── entity/           # Entidades JPA + DTOs de request
         │   └── dto/

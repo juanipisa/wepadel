@@ -2,11 +2,11 @@
     "configurations": [
         {
             "type": "java",
-            "name": "Spring Boot-MarketplaceApplication<marketplace>",
+            "name": "Spring Boot-WepadelApplication<wepadele>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
-            "mainClass": "com.uade.tpo.marketplace.MarketplaceApplication",
-            "projectName": "marketplace",
+            "mainClass": "com.uade.tpo.wepadel.WepadelApplication",
+            "projectName": "wepadel",
             "args": "",
             "envFile": "${workspaceFolder}/.env"
         }
