@@ -16,13 +16,6 @@ import lombok.Data;
 public class Usuario {
 
     public Usuario() {
-        // Constructor para usuario INVITADO (sin datos personales, rol CLIENTE por default)
-        this.nombreApellido = null;
-        this.mail = null;
-        this.password = null;
-        this.estaRegistrado = false;
-        this.rol = RolEnum.CLIENTE;
-        this.fecha_creacion = null;
     }
 
     // Constructor para usuario REGISTRADO (cliente o administrador)
@@ -32,7 +25,7 @@ public class Usuario {
         this.password = password;
         this.estaRegistrado = true;
         this.rol = rol;
-        this.fecha_creacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDateTime.now();
     }
 
     @Id
@@ -56,6 +49,6 @@ public class Usuario {
     private RolEnum rol;
 
     @Column(name = "fecha_creacion")
-    private LocalDateTime fecha_creacion;
+    private LocalDateTime fechaCreacion;
 
 }

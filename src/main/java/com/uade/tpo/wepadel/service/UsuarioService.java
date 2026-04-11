@@ -10,6 +10,5 @@ import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 public interface UsuarioService {
     public List<Usuario> getUsuarios();
     public Optional<Usuario> getUsuarioById(Long usuarioId);
-    public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException;
     public Optional<Usuario> updateUsuario(Long usuarioId, UsuarioRequest request);
 }

@@ -33,10 +33,10 @@ public class StockController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping
-    public ResponseEntity<Object> createStock(@RequestBody StockRequest stockRequest) {
+    @PostMapping("/producto/{productoId}")
+    public ResponseEntity<Object> createStock(@PathVariable Long productoId, @RequestBody StockRequest stockRequest) {
         //TODO: Validar que el usuario autenticado es ADMIN
-        Stock result = stockService.createStock(stockRequest.getProductoId(), stockRequest.getCantidad());
+        Stock result = stockService.createStock(productoId, stockRequest.getCantidad());
         return ResponseEntity.created(URI.create("/stocks/producto/" + result.getProductoId())).body(result);
     }
 

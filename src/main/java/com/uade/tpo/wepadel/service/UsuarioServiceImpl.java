@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.dto.UsuarioRequest;
-import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
 
 @Service
@@ -25,20 +24,16 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.findById(usuarioId);
     }
 
-    public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
+    /*public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
         // Validar que email no exista si se proporciona
-        if (request.getMail() != null) {
-            if (usuarioRepository.findByMail(request.getMail()).isPresent()) {
-                throw new UsuarioDuplicateException();
-            }
-            // Si tiene mail, es usuario REGISTRADO
-            return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(), 
-                    request.getPassword(), request.getRol()));
-        } else {
-            // Si no tiene mail, es usuario INVITADO (constructor sin parámetros)
-            return usuarioRepository.save(new Usuario());
+        if (usuarioRepository.findByMail(request.getMail()).isPresent()) {
+            throw new UsuarioDuplicateException();
         }
-    }
+        // Si no tiene rol, es CLIENTE por default
+        RolEnum rol = request.getRol() != null ? request.getRol() : RolEnum.CLIENTE;
+        return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(),
+                request.getPassword(), rol));
+    }*/
 
     public Optional<Usuario> updateUsuario(Long usuarioId, UsuarioRequest request) {
         return usuarioRepository.findById(usuarioId).map(usuario -> {
