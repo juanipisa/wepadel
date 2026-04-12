@@ -24,26 +24,18 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @GetMapping
-    public List<Usuario> getUsuarios() {
-        return usuarioService.getUsuarios();
+    public ResponseEntity<List<Usuario>> getUsuarios() {
+        return ResponseEntity.ok(usuarioService.getUsuarios());
     }
 
     @GetMapping("/{usuarioId}")
     public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long usuarioId) {
-        Optional<Usuario> usuario = usuarioService.getUsuarioById(usuarioId);
-        if (usuario.isPresent()) {
-            return ResponseEntity.ok(usuario.get());
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(usuarioService.getUsuarioById(usuarioId));
     }
 
     @PutMapping("/{usuarioId}")
     public ResponseEntity<Usuario> updateUsuario(@PathVariable Long usuarioId, @RequestBody UsuarioRequest usuarioRequest) {
-        Optional<Usuario> usuario = usuarioService.updateUsuario(usuarioId, usuarioRequest);
-        if (usuario.isPresent()) {
-            return ResponseEntity.ok(usuario.get());
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(usuarioService.updateUsuario(usuarioId, usuarioRequest));
     }
 
 }

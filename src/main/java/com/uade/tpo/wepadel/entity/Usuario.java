@@ -15,15 +15,14 @@ import lombok.Data;
 @Entity
 public class Usuario {
 
-    public Usuario() {
+    // Constructor requerido por JPA — no usar directamente
+    protected Usuario() {
     }
 
-    // Constructor para usuario REGISTRADO (cliente o administrador)
     public Usuario(String nombreApellido, String mail, String password, RolEnum rol) {
         this.nombreApellido = nombreApellido;
         this.mail = mail;
         this.password = password;
-        this.estaRegistrado = true;
         this.rol = rol;
         this.fechaCreacion = LocalDateTime.now();
     }
@@ -35,20 +34,17 @@ public class Usuario {
     @Column(name = "nombre_apellido", nullable = false)
     private String nombreApellido;
 
-    @Column(name = "mail", nullable = true, unique = false)
+    @Column(name = "mail", nullable = false, unique = true)
     private String mail;
 
     @Column(name = "password", nullable = false)
     private String password;
 
-    @Column(name = "estaRegistrado", nullable = false)
-    private Boolean estaRegistrado = false;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false)
     private RolEnum rol;
 
-    @Column(name = "fecha_creacion")
+    @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion;
 
 }
