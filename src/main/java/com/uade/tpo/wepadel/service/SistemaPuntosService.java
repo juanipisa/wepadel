@@ -1,9 +1,28 @@
 package com.uade.tpo.wepadel.service;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.uade.tpo.wepadel.entity.SistemaPuntos;
 
 public interface SistemaPuntosService {
-    Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId);
+    public Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId);
+    //busca registro puntos usuario, lo devuelve o vacio
+
+    public SistemaPuntos inicializarSistemaPuntos(Long usuarioId);
+    //si el usuario ya tiene registro en sistema_puntos lo devuelve. Si no lo crea
+
+    public int calcularPuntosGenerados(BigDecimal montoPagadoEnPesos);
+    //calcula cuantos puntos genera una compra. no negativos. no usar más puntos de los que tiene
+
+    public BigDecimal calcularDescuento(int puntosUsados, Long usuarioId);
+    //convierte puntos en $
+
+    public Optional<SistemaPuntos> sumarPuntos(Long usuarioId, int puntosASumar);
+    //suma puntos al usuario
+
+    public Optional<SistemaPuntos> restarPuntos(Long usuarioId, int puntosARestar);
+    //le saca puntos al usuario cuando los usa
 }
+
+
