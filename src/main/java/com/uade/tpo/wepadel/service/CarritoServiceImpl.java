@@ -56,12 +56,14 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     public Carrito createCarrito(Long usuarioId) {
-        return carritoRepository.save(new Carrito(usuarioId));
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(UsuarioNotFoundException::new);
+        return carritoRepository.save(new Carrito(usuario));
     }
 
     public List<CarritoItem> getItems(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
-        return carritoItemRepository.findByCarritoId(carrito.getId());
+        return carrito.getItems();
     }
 
     public CarritoItem addItem(Long usuarioId, CarritoItemRequest request) {
@@ -81,9 +83,8 @@ public class CarritoServiceImpl implements CarritoService {
         Stock stock = stockRepository.findByProductoId(producto.getId())
                 .orElseThrow(StockInsuficienteException::new);
 
-        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.getId());
-        Optional<CarritoItem> existente = items.stream()
-                .filter(i -> i.getProductoId().equals(request.getProductoId()))
+        Optional<CarritoItem> existente = carrito.getItems().stream()
+                .filter(i -> i.getProducto().getId().equals(request.getProductoId()))
                 .findFirst();
 
         int cantidadTotal = request.getCantidad();
@@ -100,7 +101,7 @@ public class CarritoServiceImpl implements CarritoService {
             item = existente.get();
             item.setCantidad(cantidadTotal);
         } else {
-            item = new CarritoItem(carrito.getId(), request.getProductoId(), request.getCantidad());
+            item = new CarritoItem(carrito, producto, request.getCantidad());
         }
 
         CarritoItem saved = carritoItemRepository.save(item);
@@ -112,13 +113,13 @@ public class CarritoServiceImpl implements CarritoService {
     public void removeItem(Long usuarioId, Long productoId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
 
-        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.getId());
-        CarritoItem item = items.stream()
-                .filter(i -> i.getProductoId().equals(productoId))
+        CarritoItem item = carrito.getItems().stream()
+                .filter(i -> i.getProducto().getId().equals(productoId))
                 .findFirst()
                 .orElseThrow(CarritoItemNotFoundException::new);
 
-        carritoItemRepository.delete(item);
+        carrito.getItems().remove(item);
+        carritoRepository.save(carrito);
         actualizarModificacion(carrito);
         recalcularSubtotal(carrito);
     }
@@ -126,9 +127,7 @@ public class CarritoServiceImpl implements CarritoService {
     public void vaciarCarrito(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
 
-        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.getId());
-        carritoItemRepository.deleteAll(items);
-
+        carrito.getItems().clear();
         carrito.setSubtotal(BigDecimal.ZERO);
         carrito.setUltimaModificacion(LocalDateTime.now());
         carritoRepository.save(carrito);
@@ -144,7 +143,7 @@ public class CarritoServiceImpl implements CarritoService {
             throw new AccesoDenegadoException();
         }
 
-        Carrito carrito = carritoRepository.findByUsuarioId(usuarioId)
+        Carrito carrito = carritoRepository.findByUsuario(usuario)
                 .orElseThrow(CarritoNotFoundException::new);
 
         verificarExpiracion(carrito);
@@ -158,9 +157,7 @@ public class CarritoServiceImpl implements CarritoService {
 
     private void verificarExpiracion(Carrito carrito) {
         if (carrito.getUltimaModificacion().plusDays(DIAS_EXPIRACION).isBefore(LocalDateTime.now())) {
-            List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.getId());
-            carritoItemRepository.deleteAll(items);
-
+            carrito.getItems().clear();
             carrito.setUltimaModificacion(LocalDateTime.now());
             carrito.setSubtotal(BigDecimal.ZERO);
             carritoRepository.save(carrito);
@@ -168,14 +165,11 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void recalcularSubtotal(Carrito carrito) {
-        List<CarritoItem> items = carritoItemRepository.findByCarritoId(carrito.getId());
+        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
 
         BigDecimal subtotal = items.stream()
-                .map(item -> {
-                    Producto producto = productoRepository.findById(item.getProductoId())
-                            .orElseThrow(ProductoNotFoundException::new);
-                    return producto.getPrecio().multiply(BigDecimal.valueOf(item.getCantidad()));
-                })
+                .map(item -> item.getProducto().getPrecio()
+                        .multiply(BigDecimal.valueOf(item.getCantidad())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         carrito.setSubtotal(subtotal);

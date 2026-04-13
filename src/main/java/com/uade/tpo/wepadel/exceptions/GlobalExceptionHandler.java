@@ -10,7 +10,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ESPECÍFICAS DE USUARIO
+    // ESPECÍFICAS DE USUARIO/NEGOCIO
 
     @ExceptionHandler(UsuarioNotFoundException.class)
     public ResponseEntity<Object> handleUsuarioNotFound(UsuarioNotFoundException ex) {
