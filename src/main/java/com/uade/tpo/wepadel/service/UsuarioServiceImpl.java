@@ -3,6 +3,7 @@ package com.uade.tpo.wepadel.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,29 +21,38 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.findAll();
     }
 
-    public Optional<Usuario> getUsuarioById(Long usuarioId) {
-        return usuarioRepository.findById(usuarioId);
+    public Usuario getUsuarioById(Long usuarioId) {
+        return usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNotFoundException());
     }
 
-    /*public Usuario createUsuario(UsuarioRequest request) throws UsuarioDuplicateException {
-        // Validar que email no exista si se proporciona
-        if (usuarioRepository.findByMail(request.getMail()).isPresent()) {
-            throw new UsuarioDuplicateException();
-        }
-        // Si no tiene rol, es CLIENTE por default
-        RolEnum rol = request.getRol() != null ? request.getRol() : RolEnum.CLIENTE;
-        return usuarioRepository.save(new Usuario(request.getNombreApellido(), request.getMail(),
-                request.getPassword(), rol));
-    }*/
+    public Usuario updateUsuario(Long usuarioId, UsuarioRequest request) {
+        validarUsuario(request);
 
-    public Optional<Usuario> updateUsuario(Long usuarioId, UsuarioRequest request) {
-        return usuarioRepository.findById(usuarioId).map(usuario -> {
-            if (request.getNombreApellido() != null) usuario.setNombreApellido(request.getNombreApellido());
-            if (request.getMail() != null) usuario.setMail(request.getMail());
-            if (request.getPassword() != null) usuario.setPassword(request.getPassword());
-            if (request.getRol() != null) usuario.setRol(request.getRol());
-            return usuarioRepository.save(usuario);
-        });
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new UsuarioNotFoundException());
+
+        if (request.getNombreApellido() != null) usuario.setNombreApellido(request.getNombreApellido());
+        if (request.getMail() != null) usuario.setMail(request.getMail());
+        if (request.getPassword() != null) usuario.setPassword(request.getPassword());
+        if (request.getRol() != null) usuario.setRol(request.getRol());
+
+        return usuarioRepository.save(usuario);
+    }
+
+    private void validarUsuario(UsuarioRequest request) {
+        // 1. Validar Mail (formato nombre@algo.com)
+        String regexEmail = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (request.getMail() == null || !request.getMail().matches(regexEmail)) {
+            throw new RuntimeException("El formato del mail no es válido");
+        }
+
+        // 2. Validar Contraseña (Min 12 caracteres, Mayúscula, Número y Símbolo)
+        // Explicación: (?=.*[0-9]) busca número, (?=.*[a-z]) minúscula, (?=.*[A-Z]) mayúscula, (?=.*[@#$%^&+=!]) símbolo
+        String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{12,}$";
+        if (request.getPassword() == null || !request.getPassword().matches(regexPassword)) {
+            throw new RuntimeException("La contraseña debe tener 12+ caracteres, una mayúscula, un número y un símbolo");
+        }
     }
 
 }

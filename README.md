@@ -59,6 +59,7 @@ La API queda disponible en `http://localhost:8080`. Las tablas se crean automát
 - Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
 - Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
 - Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos de la venta sin borrarlos del sistema.
+- El sistema debe verificar que el mail tenga un formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial para garantizar la integridad y seguridad de la cuenta del usuario.
 
 ## 🏗️ Arquitectura
 
