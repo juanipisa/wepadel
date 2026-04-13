@@ -10,7 +10,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ESPECÍFICAS DE USUARIO/NEGOCIO
+    // ESPECÍFICAS DE USUARIO
 
     @ExceptionHandler(UsuarioNotFoundException.class)
     public ResponseEntity<Object> handleUsuarioNotFound(UsuarioNotFoundException ex) {
@@ -20,6 +20,45 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(UsuarioDuplicateException.class)
     public ResponseEntity<Object> handleUsuarioDuplicate(UsuarioDuplicateException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "El mail ya está registrado");
+    }
+
+    @ExceptionHandler(AccesoDenegadoException.class)
+    public ResponseEntity<Object> handleAccesoDenegado(AccesoDenegadoException ex) {
+        return buildResponse(HttpStatus.FORBIDDEN, "No tenés permiso para realizar esta acción");
+    }
+
+    // ESPECÍFICAS DE CARRITO
+
+    @ExceptionHandler(CarritoNotFoundException.class)
+    public ResponseEntity<Object> handleCarritoNotFound(CarritoNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Carrito no encontrado para este usuario");
+    }
+
+    @ExceptionHandler(CarritoItemNotFoundException.class)
+    public ResponseEntity<Object> handleCarritoItemNotFound(CarritoItemNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "El producto no está en el carrito");
+    }
+
+    @ExceptionHandler(CantidadInvalidaException.class)
+    public ResponseEntity<Object> handleCantidadInvalida(CantidadInvalidaException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad debe ser mayor a 0");
+    }
+
+    // ESPECÍFICAS DE PRODUCTO/STOCK
+
+    @ExceptionHandler(ProductoNotFoundException.class)
+    public ResponseEntity<Object> handleProductoNotFound(ProductoNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Producto no encontrado");
+    }
+
+    @ExceptionHandler(ProductoNoHabilitadoException.class)
+    public ResponseEntity<Object> handleProductoNoHabilitado(ProductoNoHabilitadoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El producto no está disponible para la venta");
+    }
+
+    @ExceptionHandler(StockInsuficienteException.class)
+    public ResponseEntity<Object> handleStockInsuficiente(StockInsuficienteException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "Stock insuficiente para la cantidad solicitada");
     }
 
     @ExceptionHandler(CategoriaDuplicateException.class)

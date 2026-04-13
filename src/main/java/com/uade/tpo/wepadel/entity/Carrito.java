@@ -20,7 +20,7 @@ public class Carrito {
     // Constructor para crear carrito al registrarse o cuando invitado agrega al carrito
     public Carrito(Long usuarioId) {
         this.usuarioId = usuarioId;
-        this.creadoEn = LocalDateTime.now();
+        this.ultimaModificacion = LocalDateTime.now();
         this.subtotal = BigDecimal.ZERO;
     }
 
@@ -31,8 +31,8 @@ public class Carrito {
     @Column(name = "usuario_id", nullable = false, unique = true)
     private Long usuarioId;
 
-    @Column(name = "creado_en", nullable = false)
-    private LocalDateTime creadoEn;
+    @Column(name = "ultima_modificacion", nullable = false)
+    private LocalDateTime ultimaModificacion;
 
     @Column(name = "subtotal", nullable = false)
     private BigDecimal subtotal = BigDecimal.ZERO;

@@ -1,7 +1,6 @@
 package com.uade.tpo.wepadel.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,41 +26,28 @@ public class CarritoController {
 
     @GetMapping
     public ResponseEntity<Carrito> getCarritoByUsuarioId(@PathVariable Long usuarioId) {
-        Optional<Carrito> carrito = carritoService.getCarritoByUsuarioId(usuarioId);
-        if (carrito.isPresent()) {
-            return ResponseEntity.ok(carrito.get());
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(carritoService.getCarritoByUsuarioId(usuarioId));
     }
 
-    // Obtener items del carrito del usuario
     @GetMapping("/items")
     public ResponseEntity<List<CarritoItem>> getItems(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(carritoService.getItems(usuarioId));
     }
 
-    // Agregar item al carrito del usuario
     @PostMapping("/items")
     public ResponseEntity<CarritoItem> addItem(@PathVariable Long usuarioId, @RequestBody CarritoItemRequest request) {
-        CarritoItem item = carritoService.addItem(usuarioId, request);
-        return ResponseEntity.ok(item);
+        return ResponseEntity.ok(carritoService.addItem(usuarioId, request));
     }
 
-    // Eliminar producto del carrito del usuario
     @DeleteMapping("/items/{productoId}")
-    public ResponseEntity<Object> removeItem(@PathVariable Long usuarioId, @PathVariable Long productoId) {
-        boolean removed = carritoService.removeItem(usuarioId, productoId);
-        if (removed) {
-            return ResponseEntity.ok().build();
-        }
-        return ResponseEntity.noContent().build();
-    }
-
-    // Borrar carrito completo del usuario
-    @DeleteMapping
-    public ResponseEntity<Object> deleteCarrito(@PathVariable Long usuarioId) {
-        carritoService.deleteCarrito(usuarioId);
+    public ResponseEntity<Void> removeItem(@PathVariable Long usuarioId, @PathVariable Long productoId) {
+        carritoService.removeItem(usuarioId, productoId);
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping
+    public ResponseEntity<Void> vaciarCarrito(@PathVariable Long usuarioId) {
+        carritoService.vaciarCarrito(usuarioId);
+        return ResponseEntity.ok().build();
+    }
 }
