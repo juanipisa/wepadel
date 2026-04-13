@@ -127,6 +127,7 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario | CLIENTE |
 | `GET` | `/usuarios/{usuarioId}/carrito/items` | Listar ítems del carrito | CLIENTE |
 | `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar producto o incrementar cantidad | CLIENTE |
+| `PUT` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Actualizar cantidad (0 elimina el ítem) | CLIENTE |
 | `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar producto del carrito | CLIENTE |
 | `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar carrito completo | CLIENTE |
 

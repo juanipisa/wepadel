@@ -110,6 +110,38 @@ public class CarritoServiceImpl implements CarritoService {
         return saved;
     }
 
+    public CarritoItem updateCantidad(Long usuarioId, Long productoId, int nuevaCantidad) {
+        Carrito carrito = validarYObtenerCarrito(usuarioId);
+
+        CarritoItem item = carrito.getItems().stream()
+                .filter(i -> i.getProducto().getId().equals(productoId))
+                .findFirst()
+                .orElseThrow(CarritoItemNotFoundException::new);
+
+        if (nuevaCantidad < 0) {
+            throw new CantidadInvalidaException();
+        }
+
+        if (nuevaCantidad == 0) {
+            removeItem(usuarioId, productoId);
+            item.setCantidad(0);
+            return item;
+        }
+
+        Stock stock = stockRepository.findByProductoId(productoId)
+                .orElseThrow(StockInsuficienteException::new);
+
+        if (stock.getCantidad() < nuevaCantidad) {
+            throw new StockInsuficienteException();
+        }
+
+        item.setCantidad(nuevaCantidad);
+        carritoItemRepository.save(item);
+        actualizarModificacion(carrito);
+        recalcularSubtotal(carrito);
+        return item;
+    }
+
     public void removeItem(Long usuarioId, Long productoId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
 

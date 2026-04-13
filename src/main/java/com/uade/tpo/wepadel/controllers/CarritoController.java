@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +38,11 @@ public class CarritoController {
     @PostMapping("/items")
     public ResponseEntity<CarritoItem> addItem(@PathVariable Long usuarioId, @RequestBody CarritoItemRequest request) {
         return ResponseEntity.ok(carritoService.addItem(usuarioId, request));
+    }
+
+    @PutMapping("/items/{productoId}")
+    public ResponseEntity<CarritoItem> updateCantidad(@PathVariable Long usuarioId, @PathVariable Long productoId, @RequestBody CarritoItemRequest request) {
+        return ResponseEntity.ok(carritoService.updateCantidad(usuarioId, productoId, request.getCantidad()));
     }
 
     @DeleteMapping("/items/{productoId}")
