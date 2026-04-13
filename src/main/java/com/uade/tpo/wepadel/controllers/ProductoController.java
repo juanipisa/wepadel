@@ -2,7 +2,6 @@ package com.uade.tpo.wepadel.controllers;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,34 +25,26 @@ public class ProductoController {
     private ProductoService productoService;
 
     @GetMapping
-    public List<Producto> getProductos() {
-        return productoService.getProductos();
+    public ResponseEntity<List<Producto>> getProductos() {
+        return ResponseEntity.ok(productoService.getProductos());
     }
 
     @GetMapping("/{productoId}")
     public ResponseEntity<Producto> getProductoById(@PathVariable Long productoId) {
-        Optional<Producto> product = productoService.getProductoById(productoId);
-        if (product.isPresent()) {
-            return ResponseEntity.ok(product.get());
-        }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(productoService.getProductoById(productoId));
     }
 
     @PostMapping
-    public ResponseEntity<Object> createProducto(@RequestBody ProductoRequest productRequest) {
-        //TODO: Validar que el usuario autenticado es ADMIN
-        Producto result = productoService.createProducto(productRequest);
+    public ResponseEntity<Producto> createProducto(@RequestBody ProductoRequest request) {
+        Producto result = productoService.createProducto(request);
         return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
     }
 
     @PutMapping("/{productoId}")
-    public ResponseEntity<Producto> updateProducto(@PathVariable Long productoId, @RequestBody ProductoRequest productRequest) {
-        //TODO: Validar que el usuario autenticado es ADMIN
-        Optional<Producto> product = productoService.updateProducto(productoId, productRequest);
-        if (product.isPresent()) {
-            return ResponseEntity.ok(product.get());
-        }
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<Producto> updateProducto(@PathVariable Long productoId, @RequestBody ProductoRequest request) {
+        return productoService.updateProducto(productoId, request)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }
