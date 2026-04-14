@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class OrdenRequest {
-    private Long usuarioId;
+    private Long usuario;
     private String direccion;
     private String cp;
     private BigDecimal montoEnvio;

@@ -2,12 +2,20 @@ package com.uade.tpo.wepadel.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Data
@@ -17,10 +25,9 @@ public class Carrito {
     public Carrito() {
     }
 
-    // Constructor para crear carrito al registrarse o cuando invitado agrega al carrito
-    public Carrito(Long usuarioId) {
-        this.usuarioId = usuarioId;
-        this.creadoEn = LocalDateTime.now();
+    public Carrito(Usuario usuario) {
+        this.usuario = usuario;
+        this.ultimaModificacion = LocalDateTime.now();
         this.subtotal = BigDecimal.ZERO;
     }
 
@@ -28,13 +35,17 @@ public class Carrito {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "usuario_id", nullable = false, unique = true)
-    private Long usuarioId;
+    @OneToOne
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @JsonIgnore
+    private Usuario usuario;
 
-    @Column(name = "creado_en", nullable = false)
-    private LocalDateTime creadoEn;
+    @Column(name = "ultima_modificacion", nullable = false)
+    private LocalDateTime ultimaModificacion;
 
     @Column(name = "subtotal", nullable = false)
     private BigDecimal subtotal = BigDecimal.ZERO;
 
+    @OneToMany(mappedBy = "carrito", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CarritoItem> items = new ArrayList<>();
 }

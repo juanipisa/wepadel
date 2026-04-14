@@ -7,15 +7,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.wepadel.entity.Orden;
+import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.EstadoOrdenEnum;
 import com.uade.tpo.wepadel.entity.dto.OrdenRequest;
+import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
 import com.uade.tpo.wepadel.repository.OrdenRepository;
-
+import com.uade.tpo.wepadel.repository.UsuarioRepository;
 @Service
 public class OrdenServiceImpl implements OrdenService {
 
     @Autowired
     private OrdenRepository ordenRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
     public Optional<Orden> getOrdenById(Long ordenId) {
         return ordenRepository.findById(ordenId);
@@ -26,7 +31,11 @@ public class OrdenServiceImpl implements OrdenService {
     }
 
     public Orden createOrden(OrdenRequest request) {
-        //TODO: Validar que usuario existe
+
+        Usuario usuario = usuarioRepository.findById(request.getUsuario())
+                .orElseThrow(UsuarioNotFoundException::new);
+
+        //TODO: Validar que usuario existe (HECHO ARRIBA)
         //TODO: Validar que usuario es CLIENTE (no ADMIN)
         //TODO: Validar que carrito existe y tiene items
         //TODO: Validar que todos los productos tienen stock
@@ -39,7 +48,7 @@ public class OrdenServiceImpl implements OrdenService {
         //TODO: Sumar puntos a SistemaPuntos si usuario está registrado y es CLIENTE
         //TODO: Borrar carrito
         
-        Orden orden = new Orden(request.getUsuarioId(), request.getDireccion(), request.getCp(),
+        Orden orden = new Orden(usuario, request.getDireccion(), request.getCp(),
                 request.getMontoEnvio(), null, null, request.getUsaPuntos(), 0);
         
         return ordenRepository.save(orden);

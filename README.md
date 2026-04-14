@@ -42,8 +42,7 @@ mvnw.cmd spring-boot:run
 La API queda disponible en `http://localhost:8080`. Las tablas se crean automáticamente al iniciar.
 
 ## 🧠 Lógica de negocio
-- Los usuarios invitados pueden ver y agregar productos al carrito (persistiendo en el frontend); los registrados acceden a su perfil, historial de compras y beneficios de puntos.
-- Si un invitado agrega productos al carrito y luego se registra, esos productos se transfieren automáticamente a su nueva cuenta.
+- Los usuarios invitados pueden ver los diferentes productos que ofrece WePadel; los registrados ademas podran agregar esos mismos productos al carrito, acceder a su perfil, historial de compras y beneficios de puntos.
 - El administrador tiene credenciales únicas, proporcionadas por el equipo técnico, una vista exclusiva para gestionar stock y precios, y no puede realizar compras ni tener un carrito.
 - Al registrar un usuario cliente, se crea automáticamente su carrito; para los invitados, solamente persiste en el frontend.
 - El carrito del usuario registrado persiste por 7 días; si no se concreta la compra en ese plazo, se vacía automáticamente.
@@ -128,6 +127,7 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario | CLIENTE |
 | `GET` | `/usuarios/{usuarioId}/carrito/items` | Listar ítems del carrito | CLIENTE |
 | `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar producto o incrementar cantidad | CLIENTE |
+| `PUT` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Actualizar cantidad (0 elimina el ítem) | CLIENTE |
 | `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar producto del carrito | CLIENTE |
 | `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar carrito completo | CLIENTE |
 
