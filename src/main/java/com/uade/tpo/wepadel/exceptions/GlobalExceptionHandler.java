@@ -10,7 +10,31 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ESPECÍFICAS DE USUARIO/NEGOCIO
+    // PRODUCTO
+
+    @ExceptionHandler(ProductoNotFoundException.class)
+    public ResponseEntity<Object> handleProductoNotFound(ProductoNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Producto no encontrado");
+    }
+
+    @ExceptionHandler(ProductoInvalidoException.class)
+    public ResponseEntity<Object> handleProductoInvalido(ProductoInvalidoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    // STOCK
+
+    @ExceptionHandler(StockNotFoundException.class)
+    public ResponseEntity<Object> handleStockNotFound(StockNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Stock no encontrado para el producto");
+    }
+
+    @ExceptionHandler(StockNegativoException.class)
+    public ResponseEntity<Object> handleStockNegativo(StockNegativoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El stock no puede ser negativo");
+    }
+
+    // USUARIO
 
     @ExceptionHandler(UsuarioNotFoundException.class)
     public ResponseEntity<Object> handleUsuarioNotFound(UsuarioNotFoundException ex) {
@@ -37,10 +61,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleJsonError(org.springframework.http.converter.HttpMessageNotReadableException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, "Error en el formato del JSON o valor de Rol inválido");
+        return buildResponse(HttpStatus.BAD_REQUEST, "Error en el formato del JSON o valor de enum inválido");
     }
 
-    @ExceptionHandler(RuntimeException.class) // Usada para validaciones manuales de mail/pass
+    @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntime(RuntimeException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
