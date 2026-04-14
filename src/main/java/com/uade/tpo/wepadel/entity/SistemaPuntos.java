@@ -1,10 +1,14 @@
 package com.uade.tpo.wepadel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import lombok.Data;
 
 @Data
@@ -17,8 +21,8 @@ public class SistemaPuntos {
 
     // Constructor para crear SistemaPuntos cuando usuario CLIENTE se registra
     // Se crea SOLO si el usuario está registrado Y es CLIENTE
-    public SistemaPuntos(Long usuarioId, int conversion) {
-        this.usuarioId = usuarioId;
+    public SistemaPuntos(Usuario usuario, int conversion) {
+        this.usuario = usuario;
         this.cantidad = 0;  // Inicia con 0 puntos acumulados
         this.conversion = conversion;
     }
@@ -27,8 +31,10 @@ public class SistemaPuntos {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "usuario_id", nullable = false, unique = true)
-    private Long usuarioId;
+    @OneToOne
+    @JoinColumn(name = "usuario_id", nullable = false, unique = true)
+    @JsonIgnore
+    private Usuario usuario;
 
     @Column(name = "cantidad", nullable = false)
     private int cantidad = 0;

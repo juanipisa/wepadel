@@ -10,18 +10,6 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-    // PRODUCTO
-
-    @ExceptionHandler(ProductoNotFoundException.class)
-    public ResponseEntity<Object> handleProductoNotFound(ProductoNotFoundException ex) {
-        return buildResponse(HttpStatus.NOT_FOUND, "Producto no encontrado");
-    }
-
-    @ExceptionHandler(ProductoInvalidoException.class)
-    public ResponseEntity<Object> handleProductoInvalido(ProductoInvalidoException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
     // STOCK
 
     @ExceptionHandler(StockNotFoundException.class)
@@ -73,6 +61,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ProductoNotFoundException.class)
     public ResponseEntity<Object> handleProductoNotFound(ProductoNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, "Producto no encontrado");
+    }
+
+    @ExceptionHandler(ProductoInvalidoException.class)
+    public ResponseEntity<Object> handleProductoInvalido(ProductoInvalidoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
     @ExceptionHandler(ProductoNoHabilitadoException.class)

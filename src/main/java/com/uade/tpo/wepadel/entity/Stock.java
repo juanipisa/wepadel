@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
@@ -16,8 +18,8 @@ public class Stock {
     public Stock() {
     }
 
-    public Stock(Long productoId, int cantidad) {
-        this.productoId = productoId;
+    public Stock(Producto producto, int cantidad) {
+        this.producto = producto;
         this.cantidad = cantidad;
         this.ultimaModificacion = LocalDateTime.now();
     }
@@ -26,8 +28,9 @@ public class Stock {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "producto_id", nullable = false, unique = true)
-    private Long productoId;
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;
 
     @Column(name = "cantidad", nullable = false)
     private int cantidad;

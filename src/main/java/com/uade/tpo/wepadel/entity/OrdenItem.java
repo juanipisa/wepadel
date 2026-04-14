@@ -2,11 +2,15 @@ package com.uade.tpo.wepadel.entity;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 @Data
@@ -17,9 +21,9 @@ public class OrdenItem {
     }
 
     // Se crea automáticamente cuando se confirma la orden
-    public OrdenItem(Long ordenId, Long productoId, int cantidad, BigDecimal precioUnitario) {
-        this.ordenId = ordenId;
-        this.productoId = productoId;
+    public OrdenItem(Orden orden, Producto producto, int cantidad, BigDecimal precioUnitario) {
+        this.orden = orden;
+        this.producto = producto;
         this.cantidad = cantidad;
         this.precioUnitario = precioUnitario;
     }
@@ -28,11 +32,14 @@ public class OrdenItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "orden_id", nullable = false)
-    private Long ordenId;
+    @ManyToOne
+    @JoinColumn(name = "orden_id", nullable = false)
+    @JsonIgnore
+    private Orden orden;
 
-    @Column(name = "producto_id", nullable = false)
-    private Long productoId;
+    @ManyToOne
+    @JoinColumn(name = "producto_id", nullable = false)
+    private Producto producto;
 
     @Column(name = "cantidad", nullable = false)
     private int cantidad;

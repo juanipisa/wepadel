@@ -41,7 +41,7 @@ public class ProductoServiceImpl implements ProductoService {
         );
 
         // Inicializar stock en cero automáticamente al crear el producto
-        stockRepository.save(new Stock(producto.getId(), 0));
+        stockRepository.save(new Stock(producto, 0));
 
         return producto;
     }
