@@ -12,18 +12,13 @@ import com.uade.tpo.wepadel.repository.SistemaPuntosRepository;
 @Service
 public class SistemaPuntosServiceImpl implements SistemaPuntosService {
 
-    private static final int conversion = 5; // 1 punto = $5
+    // 1 punto = $5
 
     @Autowired
     private SistemaPuntosRepository sistemaPuntosRepository;
 
     public Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId) {
         return sistemaPuntosRepository.findByUsuarioId(usuarioId);
-    }
-
-    public SistemaPuntos inicializarSistemaPuntos(Long usuarioId) {
-        return sistemaPuntosRepository.findByUsuarioId(usuarioId)
-                .orElseGet(() -> sistemaPuntosRepository.save(new SistemaPuntos(usuarioId, conversion)));
     }
 
     public int calcularPuntosGenerados(BigDecimal montoPagadoEnPesos) {

@@ -9,9 +9,6 @@ public interface SistemaPuntosService {
     public Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId);
     //busca registro puntos usuario, lo devuelve o vacio
 
-    public SistemaPuntos inicializarSistemaPuntos(Long usuarioId);
-    //si el usuario ya tiene registro en sistema_puntos lo devuelve. Si no lo crea
-
     public int calcularPuntosGenerados(BigDecimal montoPagadoEnPesos);
     //calcula cuantos puntos genera una compra. no negativos. no usar más puntos de los que tiene
 
