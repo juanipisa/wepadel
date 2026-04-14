@@ -7,9 +7,8 @@ import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
 
 public interface ProductoService {
-    public List<Producto> getProductos();
-    public Optional<Producto> getProductoById(Long productoId);
-    public Producto createProducto(ProductoRequest request);
-    public Optional<Producto> updateProducto(Long productoId, ProductoRequest request);
-    //TODO: Debo filtrar productos por estaHabilitado en getProductos()?
+    List<Producto> getProductos();
+    Producto getProductoById(Long productoId);
+    Producto createProducto(ProductoRequest request);
+    Optional<Producto> updateProducto(Long productoId, ProductoRequest request);
 }
