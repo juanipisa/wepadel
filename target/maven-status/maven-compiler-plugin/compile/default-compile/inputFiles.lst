@@ -34,7 +34,6 @@ C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exception
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\GlobalExceptionHandler.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ImagenNotFoundException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ProductoInvalidoException.java
-C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ProductoInvalidoMotivo.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ProductoNoHabilitadoException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ProductoNotFoundException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\StockInsuficienteException.java

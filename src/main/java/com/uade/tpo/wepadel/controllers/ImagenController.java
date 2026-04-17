@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,7 +29,7 @@ public class ImagenController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createImagen(AddImagenRequest request) {
+    public ResponseEntity<Void> createImagen(@ModelAttribute AddImagenRequest request) {
         Long id = imagenService.createImagen(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/imagenes/" + id))

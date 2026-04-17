@@ -29,7 +29,7 @@ public class ImagenServiceImpl implements ImagenService {
 
     @Override
     public ImagenResponse getImagenById(Long id) {
-        Imagen imagen = imagenRepository.findById(id).orElseThrow(() -> new ImagenNotFoundException());
+        Imagen imagen = imagenRepository.findById(id).orElseThrow(ImagenNotFoundException::new);
         byte[] bytes = imagen.getContenido();
         if (bytes == null || bytes.length == 0) {
             throw new ImagenNotFoundException();
