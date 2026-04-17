@@ -156,7 +156,7 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 ### Recurso: Auth
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| `POST` | `/auth/login` | Autenticar credenciales y devolver JWT | — |
+| `POST` | `/auth/authenticate` | Autenticar credenciales (Login) y devolver JWT | — |
 | `POST` | `/auth/register` | Registrar usuario y devolver token | — |
 
 # 🗺️ Roadmap y tareas del proyecto
@@ -171,13 +171,13 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Diagrama UML de clases
 
 ### 🔐 Entrega #2 — Seguridad con JWT `(vence 22/04)`
-- [ ] Integrar Spring Security
-- [ ] Implementar autenticación con JWT
-- [ ] Endpoint de login (`POST /auth/login`)
-- [ ] Endpoint de registro que devuelva token
-- [ ] Hashear passwords con BCrypt
-- [ ] Proteger endpoints según rol (USER / ADMIN)
-- [ ] Agregar clase `Rol` y relacionarla con `Usuario`
+- [x] Integrar Spring Security
+- [x] Implementar autenticación con JWT
+- [x] Endpoint de login (`POST /auth/authenticate`)
+- [x] Endpoint de registro que devuelva token
+- [x] Hashear passwords con BCrypt
+- [x] Proteger endpoints según rol (CLIENTE / ADMINISTRADOR)
+- [x] Implementar `UserDetails` en la entidad `Usuario`
 
 ### 🎨 Entrega #3 — Maquetación visual del frontend `(vence 20/05)`
 - [ ] Definir pantallas: Home, Catálogo, Detalle de producto, Carrito, Login, Registro, Checkout
@@ -209,7 +209,7 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Actualizar lógica de endpoints en base a nueva definición
 - [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
 - [ ] Crear excepciones
-- [ ] Integración JWT
+- [x] Integración JWT
 - [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
 - [ ] Actualizar services con lógica de negocio
 - [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
