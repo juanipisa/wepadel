@@ -56,6 +56,7 @@ La API queda disponible en `http://localhost:8080`. Las tablas se crean automát
 - Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario solo dentro de las primeras 24 horas.
 - Al confirmarse una cancelación, la orden pasa a estado CANCELADA, el stock de los productos se restaura y los puntos generados se eliminan.
 - Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
+- Cada producto puede tener varias imágenes: se almacenan en base como BLOB, se suben por `multipart/form-data` y en las respuestas JSON se exponen en Base64 (`archivoBase64`) para consumo desde el frontend.
 - Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
 - Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos de la venta sin borrarlos del sistema.
 - El sistema debe verificar que el mail tenga un formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial para garantizar la integridad y seguridad de la cuenta del usuario.
@@ -78,7 +79,7 @@ src/
         │   └── dto/
         ├── service/          # Interfaces de negocio + implementaciones
         ├── repository/       # Interfaces JpaRepository
-        └── exceptions/       # Excepciones con @ResponseStatus
+        └── exceptions/       # Excepciones de dominio + GlobalExceptionHandler (@ControllerAdvice)
 ```
 
 ### Frontend *(a construir)*
@@ -103,6 +104,7 @@ TBC
 - ORDEN_ITEM
 - PRODUCTO
 - STOCK
+- IMAGEN *(binario en columna BLOB)*
 
 Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O_wKtDfw2Tl/view?usp=sharing
 
@@ -146,6 +148,13 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `GET` | `/productos/{productoId}` | Obtener detalle de producto | — |
 | `POST` | `/productos` | Crear producto | ADMINISTRADOR |
 | `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
+| `GET` | `/productos/{productoId}/imagenes` | Listar imágenes del producto (metadatos + Base64) | — |
+
+### Recurso: Imágenes
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/imagenes/{imagenId}` | Obtener una imagen por id | — |
+| `POST` | `/imagenes` | Subir imagen asociada a un producto | — |
 
 ### Recurso: Stocks
 | Método | Endpoint | Descripción |
@@ -208,7 +217,7 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Crear UML
 - [ ] Actualizar lógica de endpoints en base a nueva definición
 - [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
-- [ ] Crear excepciones
+- [ ] Unificar / documentar excepciones y respuestas de error (handler vs. reglas por endpoint)
 - [ ] Integración JWT
 - [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
 - [ ] Actualizar services con lógica de negocio
