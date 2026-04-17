@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.wepadel.entity.Carrito;
 import com.uade.tpo.wepadel.entity.CarritoItem;
+import com.uade.tpo.wepadel.entity.Descuento;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.RolEnum;
 import com.uade.tpo.wepadel.entity.Stock;
@@ -48,6 +49,9 @@ public class CarritoServiceImpl implements CarritoService {
 
     @Autowired
     private StockRepository stockRepository;
+
+    @Autowired
+    private DescuentoServiceImpl descuentoServiceImpl;
 
     public Carrito getCarritoByUsuarioId(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
@@ -197,14 +201,22 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void recalcularSubtotal(Carrito carrito) {
-        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
+    List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
 
-        BigDecimal subtotal = items.stream()
-                .map(item -> item.getProducto().getPrecio()
-                        .multiply(BigDecimal.valueOf(item.getCantidad())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    BigDecimal subtotal = items.stream()
+            .map(item -> {
+                BigDecimal precio = item.getProducto().getPrecio();
+                Optional<Descuento> descuento = descuentoServiceImpl.getDescuentoVigente(item.getProducto().getId());
+                if (descuento.isPresent()) {
+                    BigDecimal porcentaje = descuento.get().getPorcentaje();
+                    BigDecimal factor = BigDecimal.ONE.subtract(porcentaje.divide(BigDecimal.valueOf(100)));
+                    precio = precio.multiply(factor);
+                }
+                return precio.multiply(BigDecimal.valueOf(item.getCantidad()));
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        carrito.setSubtotal(subtotal);
-        carritoRepository.save(carrito);
-    }
+    carrito.setSubtotal(subtotal);
+    carritoRepository.save(carrito);
+}
 }
