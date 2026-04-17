@@ -29,7 +29,7 @@ public class ImagenController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createImagen(@ModelAttribute AddImagenRequest request) {
+    public ResponseEntity<Void> createImagen(AddImagenRequest request) {
         Long id = imagenService.createImagen(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/imagenes/" + id))
