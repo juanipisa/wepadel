@@ -45,6 +45,23 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    // SISTEMA DE PUNTOS
+    
+    @ExceptionHandler(SistemaPuntosNotFoundException.class)
+    public ResponseEntity<Object> handleSistemaPuntosNotFound(SistemaPuntosNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "El usuario no tiene sistema de puntos inicializado");
+    }
+
+    @ExceptionHandler(PuntosInsuficientesException.class)
+    public ResponseEntity<Object> handlePuntosInsuficientes(PuntosInsuficientesException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El usuario no tiene suficientes puntos");
+    }
+
+    @ExceptionHandler(PuntosNegativosException.class)
+    public ResponseEntity<Object> handlePuntosNegativos(PuntosNegativosException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad de puntos no puede ser negativa");
+    }
+
     // AUX
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
