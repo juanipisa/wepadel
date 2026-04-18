@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.uade.tpo.wepadel.entity.Descuento;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.DescuentoRequest;
+import com.uade.tpo.wepadel.exceptions.DescuentoNotFoundException;
 import com.uade.tpo.wepadel.exceptions.ProductoNotFoundException;
 import com.uade.tpo.wepadel.repository.DescuentoRepository;
 import com.uade.tpo.wepadel.repository.ProductoRepository;
@@ -46,7 +47,7 @@ public class DescuentoServiceImpl implements DescuentoService {
     @Override
     public Descuento getDescuentoById(Long id) {
         return descuentoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Descuento no encontrado"));
+                .orElseThrow(DescuentoNotFoundException::new);
     }
 
     @Override
