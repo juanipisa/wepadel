@@ -51,6 +51,9 @@ public class OrdenServiceImpl implements OrdenService {
     @Autowired
     private StockService stockService;
 
+    @Autowired
+    private SistemaPuntosService sistemaPuntosService;
+
     public Optional<Orden> getOrdenById(Long ordenId) {
         return ordenRepository.findById(ordenId);
     }
@@ -88,8 +91,25 @@ public class OrdenServiceImpl implements OrdenService {
 
         BigDecimal total = request.getMontoEnvio().add(subtotal);
 
+        int puntosUsadosEnCompra = 0;
+        if (Boolean.TRUE.equals(request.getUsaPuntos()) && request.getPuntosUsados() != null
+                && request.getPuntosUsados() > 0) {
+            puntosUsadosEnCompra = request.getPuntosUsados();
+            BigDecimal descuento = sistemaPuntosService.calcularDescuentoPorPuntos(puntosUsadosEnCompra, usuario.getId());
+            total = total.subtract(descuento);
+            if (total.compareTo(BigDecimal.ZERO) < 0) {
+                total = BigDecimal.ZERO;
+            }
+            sistemaPuntosService.restarPuntos(usuario.getId(), puntosUsadosEnCompra);
+        }
+
+        int puntosGenerados = sistemaPuntosService.calcularPuntosGenerados(total);
+        if (puntosGenerados > 0) {
+            sistemaPuntosService.sumarPuntos(usuario.getId(), puntosGenerados);
+        }
+
         Orden orden = new Orden(usuario, request.getDireccion(), request.getCp(),
-                request.getMontoEnvio(), subtotal, total, request.getUsaPuntos(), 0);
+                request.getMontoEnvio(), subtotal, total, request.getUsaPuntos(), puntosGenerados, puntosUsadosEnCompra);
 
         for (CarritoItem item : carrito.getItems()) {
             BigDecimal precioSnapshot = item.getProducto().getPrecio();
@@ -108,21 +128,17 @@ public class OrdenServiceImpl implements OrdenService {
 
         carritoService.vaciarCarrito(usuario.getId());
 
-        // TODO: descuento por puntos (cuando esté mergeado)
-        // TODO: puntos_generados según regla de negocio
-        // TODO: acreditar puntos en SistemaPuntos si corresponde
-
         return guardada;
     }
 
+    @Transactional
     public Optional<Orden> cancelarOrden(Long ordenId) {
-        // TODO: Restar puntos_generados del usuario si es CLIENTE registrado
-        // TODO: Si usuario consumió puntos, devolverlos
         Orden orden = ordenRepository.findById(ordenId).orElseThrow(OrdenNotFoundException::new);
         if (orden.getEstado() != EstadoOrdenEnum.CONFIRMADA) {
             throw new OrdenCantBeCancelledException();
         }
-        if (orden.getFechaCompra().isAfter(LocalDateTime.now().minusHours(24))) {
+        // Solo se puede cancelar dentro de las primeras 24 h desde la compra
+        if (orden.getFechaCompra().isBefore(LocalDateTime.now().minusHours(24))) {
             throw new OrdenCantBeCancelledException();
         }
         orden.setEstado(EstadoOrdenEnum.CANCELADA);
@@ -133,6 +149,15 @@ public class OrdenServiceImpl implements OrdenService {
             StockRequest stockRequest = new StockRequest();
             stockRequest.setCantidad(nuevaCantidad);
             stockService.updateStock(item.getProducto().getId(), stockRequest);
+        }
+        Long uid = orden.getUsuario().getId();
+        // Quitar al usuario los puntos que se le habian bonificado por esta compra
+        if (orden.getPuntosGenerados() > 0) {
+            sistemaPuntosService.restarPuntos(uid, orden.getPuntosGenerados());
+        }
+        // Si en la compra habia canjeado puntos, se le reintegran
+        if (orden.getPuntosUsados() > 0) {
+            sistemaPuntosService.sumarPuntos(uid, orden.getPuntosUsados());
         }
         return Optional.of(orden);
     }

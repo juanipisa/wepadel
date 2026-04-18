@@ -29,7 +29,7 @@ public class Orden {
 
     // Constructor para crear una orden cuando el usuario hace clic en pagar
     public Orden(Usuario usuario, String direccion, String cp, BigDecimal montoEnvio,
-                 BigDecimal subtotal, BigDecimal total, Boolean usaPuntos, int puntosGenerados) {
+                 BigDecimal subtotal, BigDecimal total, Boolean usaPuntos, int puntosGenerados, int puntosUsados) {
         this.usuario = usuario;
         this.direccion = direccion;
         this.cp = cp;
@@ -40,6 +40,7 @@ public class Orden {
         this.fechaCompra = LocalDateTime.now();
         this.usaPuntos = usaPuntos;
         this.puntosGenerados = puntosGenerados;
+        this.puntosUsados = puntosUsados;
     }
 
     @Id
@@ -88,6 +89,10 @@ public class Orden {
     // Se suman al usuario cuando la orden se confirma
     @Column(name = "puntos_generados", nullable = false)
     private int puntosGenerados = 0;
+
+    // Puntos del saldo que el usuario canjeó en esta compra (para devolverlos si cancela)
+    @Column(name = "puntos_usados", nullable = false)
+    private int puntosUsados = 0;
 
     // Email para gestionar reembolsos
     // Se envía formulario por email, no se guarda en BD

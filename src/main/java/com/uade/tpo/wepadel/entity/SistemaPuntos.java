@@ -40,6 +40,6 @@ public class SistemaPuntos {
     private int cantidad = 0;
 
     @Column(name = "conversion", nullable = false)
-    private int conversion; // TODO: hacer la lógica de conversión
+    private int conversion;
 
 }
