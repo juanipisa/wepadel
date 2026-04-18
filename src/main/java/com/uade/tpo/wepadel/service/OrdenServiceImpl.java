@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.wepadel.entity.Carrito;
 import com.uade.tpo.wepadel.entity.CarritoItem;
+import com.uade.tpo.wepadel.entity.Descuento;
 import com.uade.tpo.wepadel.entity.EstadoOrdenEnum;
 import com.uade.tpo.wepadel.entity.Orden;
 import com.uade.tpo.wepadel.entity.OrdenItem;
@@ -46,6 +47,9 @@ public class OrdenServiceImpl implements OrdenService {
     private CarritoService carritoService;
 
     @Autowired
+    private DescuentoService descuentoService;
+
+    @Autowired
     private StockRepository stockRepository;
 
     @Autowired
@@ -64,17 +68,17 @@ public class OrdenServiceImpl implements OrdenService {
 
     @Transactional
     public Orden createOrden(OrdenRequest request) {
-
+    
         Usuario usuario = usuarioRepository.findById(request.getUsuario())
                 .orElseThrow(UsuarioNotFoundException::new);
-
+    
         Carrito carrito = carritoRepository.findByUsuario(usuario)
                 .orElseThrow(CarritoNotFoundException::new);
-
+    
         if (carrito.getItems().isEmpty()) {
             throw new CarritoVacioException();
         }
-
+    
         for (CarritoItem item : carrito.getItems()) {
             Stock stock = stockRepository.findByProductoId(item.getProducto().getId())
                     .orElseThrow(StockNotFoundException::new);
@@ -82,84 +86,94 @@ public class OrdenServiceImpl implements OrdenService {
                 throw new StockInsuficienteException();
             }
         }
-
-        BigDecimal subtotal = BigDecimal.ZERO;
-        for (CarritoItem item : carrito.getItems()) {
-            BigDecimal precio = item.getProducto().getPrecio();
-            subtotal = subtotal.add(precio.multiply(BigDecimal.valueOf(item.getCantidad())));
-        }
-
+    
+        Orden orden = new Orden(usuario, request.getDireccion(), request.getCp(),
+                request.getMontoEnvio(), BigDecimal.ZERO, BigDecimal.ZERO,
+                request.getUsaPuntos(), 0, 0);
+    
+        BigDecimal subtotal = calcularSubtotalConDescuentos(carrito.getItems(), orden);
         BigDecimal total = request.getMontoEnvio().add(subtotal);
-
+    
         int puntosUsadosEnCompra = 0;
         if (Boolean.TRUE.equals(request.getUsaPuntos()) && request.getPuntosUsados() != null
                 && request.getPuntosUsados() > 0) {
             puntosUsadosEnCompra = request.getPuntosUsados();
-            BigDecimal descuento = sistemaPuntosService.calcularDescuentoPorPuntos(puntosUsadosEnCompra, usuario.getId());
-            total = total.subtract(descuento);
-            if (total.compareTo(BigDecimal.ZERO) < 0) {
-                total = BigDecimal.ZERO;
-            }
+            BigDecimal descuentoPuntos = sistemaPuntosService.calcularDescuentoPorPuntos(puntosUsadosEnCompra, usuario.getId());
+            total = total.subtract(descuentoPuntos);
+            if (total.compareTo(BigDecimal.ZERO) < 0) total = BigDecimal.ZERO;
             sistemaPuntosService.restarPuntos(usuario.getId(), puntosUsadosEnCompra);
         }
-
+    
         int puntosGenerados = sistemaPuntosService.calcularPuntosGenerados(total);
-        if (puntosGenerados > 0) {
-            sistemaPuntosService.sumarPuntos(usuario.getId(), puntosGenerados);
-        }
-
-        Orden orden = new Orden(usuario, request.getDireccion(), request.getCp(),
-                request.getMontoEnvio(), subtotal, total, request.getUsaPuntos(), puntosGenerados, puntosUsadosEnCompra);
-
-        for (CarritoItem item : carrito.getItems()) {
-            BigDecimal precioSnapshot = item.getProducto().getPrecio();
-            orden.getItems().add(new OrdenItem(orden, item.getProducto(), item.getCantidad(), precioSnapshot));
-        }
-
+        if (puntosGenerados > 0) sistemaPuntosService.sumarPuntos(usuario.getId(), puntosGenerados);
+    
+        orden.setSubtotal(subtotal);
+        orden.setTotal(total);
+        orden.setPuntosGenerados(puntosGenerados);
+        orden.setPuntosUsados(puntosUsadosEnCompra);
+    
         Orden guardada = ordenRepository.save(orden);
-
-        for (OrdenItem item : guardada.getItems()) {
-            Stock stock = stockService.getStockByProductoId(item.getProducto().getId());
-            int nuevaCantidad = stock.getCantidad() - item.getCantidad();
-            StockRequest stockRequest = new StockRequest();
-            stockRequest.setCantidad(nuevaCantidad);
-            stockService.updateStock(item.getProducto().getId(), stockRequest);
-        }
-
+    
+        ajustarStock(guardada.getItems(),-1);
         carritoService.vaciarCarrito(usuario.getId());
-
+    
         return guardada;
     }
 
     @Transactional
     public Optional<Orden> cancelarOrden(Long ordenId) {
-        Orden orden = ordenRepository.findById(ordenId).orElseThrow(OrdenNotFoundException::new);
+        Orden orden = ordenRepository.findById(ordenId)
+                .orElseThrow(OrdenNotFoundException::new);
+    
         if (orden.getEstado() != EstadoOrdenEnum.CONFIRMADA) {
             throw new OrdenCantBeCancelledException();
         }
-        // Solo se puede cancelar dentro de las primeras 24 h desde la compra
         if (orden.getFechaCompra().isBefore(LocalDateTime.now().minusHours(24))) {
             throw new OrdenCantBeCancelledException();
         }
+    
         orden.setEstado(EstadoOrdenEnum.CANCELADA);
         ordenRepository.save(orden);
-        for (OrdenItem item : orden.getItems()) {
-            Stock stock = stockService.getStockByProductoId(item.getProducto().getId());
-            int nuevaCantidad = stock.getCantidad() + item.getCantidad();
-            StockRequest stockRequest = new StockRequest();
-            stockRequest.setCantidad(nuevaCantidad);
-            stockService.updateStock(item.getProducto().getId(), stockRequest);
-        }
+    
+        ajustarStock(orden.getItems(),1);
+    
         Long uid = orden.getUsuario().getId();
-        // Quitar al usuario los puntos que se le habian bonificado por esta compra
         if (orden.getPuntosGenerados() > 0) {
             sistemaPuntosService.restarPuntos(uid, orden.getPuntosGenerados());
         }
-        // Si en la compra habia canjeado puntos, se le reintegran
         if (orden.getPuntosUsados() > 0) {
             sistemaPuntosService.sumarPuntos(uid, orden.getPuntosUsados());
         }
+    
         return Optional.of(orden);
+    }
+
+    private BigDecimal calcularSubtotalConDescuentos(List<CarritoItem> items, Orden orden) {
+        BigDecimal subtotal = BigDecimal.ZERO;
+        for (CarritoItem item : items) {
+            BigDecimal precioOriginal = item.getProducto().getPrecio();
+            BigDecimal precioFinal = precioOriginal;
+    
+            Optional<Descuento> descuento = descuentoService.getDescuentoVigente(item.getProducto().getId());
+            if (descuento.isPresent()) {
+                BigDecimal factor = BigDecimal.ONE.subtract(
+                    descuento.get().getPorcentaje().divide(BigDecimal.valueOf(100)));
+                precioFinal = precioOriginal.multiply(factor);
+            }
+    
+            subtotal = subtotal.add(precioFinal.multiply(BigDecimal.valueOf(item.getCantidad())));
+            orden.getItems().add(new OrdenItem(orden, item.getProducto(), item.getCantidad(), precioFinal));
+        }
+        return subtotal;
+    }
+    
+    private void ajustarStock(List<OrdenItem> items, int signo) {
+        for (OrdenItem item : items) {
+            Stock stock = stockService.getStockByProductoId(item.getProducto().getId());
+            StockRequest stockRequest = new StockRequest();
+            stockRequest.setCantidad(stock.getCantidad() + (signo * item.getCantidad()));
+            stockService.updateStock(item.getProducto().getId(), stockRequest);
+        }
     }
 
 }
