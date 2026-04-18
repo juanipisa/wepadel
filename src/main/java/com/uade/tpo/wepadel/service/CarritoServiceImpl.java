@@ -51,7 +51,7 @@ public class CarritoServiceImpl implements CarritoService {
     private StockRepository stockRepository;
 
     @Autowired
-    private DescuentoServiceImpl descuentoServiceImpl;
+    private DescuentoService descuentoService;
 
     public Carrito getCarritoByUsuarioId(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
@@ -206,7 +206,7 @@ public class CarritoServiceImpl implements CarritoService {
     BigDecimal subtotal = items.stream()
             .map(item -> {
                 BigDecimal precio = item.getProducto().getPrecio();
-                Optional<Descuento> descuento = descuentoServiceImpl.getDescuentoVigente(item.getProducto().getId());
+                Optional<Descuento> descuento = descuentoService.getDescuentoVigente(item.getProducto().getId());
                 if (descuento.isPresent()) {
                     BigDecimal porcentaje = descuento.get().getPorcentaje();
                     BigDecimal factor = BigDecimal.ONE.subtract(porcentaje.divide(BigDecimal.valueOf(100)));
