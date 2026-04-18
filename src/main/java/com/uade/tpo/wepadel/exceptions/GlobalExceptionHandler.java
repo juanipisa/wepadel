@@ -106,6 +106,14 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+
+    // DESCUENTO
+    
+    @ExceptionHandler(DescuentoNotFoundException.class)
+    public ResponseEntity<Object> handleDescuentoNotFound(DescuentoNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Descuento no encontrado");
+    }
+
     // AUX
     private ResponseEntity<Object> buildResponse(HttpStatus status, String message) {
         Map<String, Object> body = new LinkedHashMap<>();
