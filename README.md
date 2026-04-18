@@ -150,6 +150,15 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
 | `GET` | `/productos/{productoId}/imagenes` | Listar imágenes del producto (metadatos + Base64) | — |
 
+### Recurso: Descuentos
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|------|
+| `POST` | `/descuentos` | Crear un descuento para un producto | ADMINISTRADOR |
+| `GET` | `/descuentos/{id}` | Obtener un descuento por id | – |
+| `GET` | `/descuentos/producto/{productoId}` | Obtener todos los descuentos de un producto | – |
+| `DELETE` | `/descuentos/{id}` | Eliminar un descuento | ADMINISTRADOR |
+
 ### Recurso: Imágenes
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
