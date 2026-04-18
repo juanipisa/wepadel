@@ -63,6 +63,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, "Producto no encontrado");
     }
 
+    @ExceptionHandler(ImagenNotFoundException.class)
+    public ResponseEntity<Object> handleImagenNotFound(ImagenNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "No hay imagen con el id proporcionado");
+    }
+
     @ExceptionHandler(ProductoInvalidoException.class)
     public ResponseEntity<Object> handleProductoInvalido(ProductoInvalidoException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
@@ -99,6 +104,14 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntime(RuntimeException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+
+    // DESCUENTO
+    
+    @ExceptionHandler(DescuentoNotFoundException.class)
+    public ResponseEntity<Object> handleDescuentoNotFound(DescuentoNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Descuento no encontrado");
     }
 
     // SISTEMA DE PUNTOS

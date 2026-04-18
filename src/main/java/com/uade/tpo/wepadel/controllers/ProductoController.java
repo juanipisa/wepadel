@@ -14,7 +14,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.Producto;
+import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
+import com.uade.tpo.wepadel.service.ImagenService;
 import com.uade.tpo.wepadel.service.ProductoService;
 
 @RestController
@@ -23,6 +25,9 @@ public class ProductoController {
 
     @Autowired
     private ProductoService productoService;
+
+    @Autowired
+    private ImagenService imagenService;
 
     @GetMapping
     public ResponseEntity<List<Producto>> getProductos() {
@@ -45,6 +50,11 @@ public class ProductoController {
         return productoService.updateProducto(productoId, request)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{productoId}/imagenes")
+    public ResponseEntity<List<ImagenResponse>> getImagenesByProductoId(@PathVariable Long productoId) {
+        return ResponseEntity.ok(imagenService.getImagenesByProductoId(productoId));
     }
 
 }
