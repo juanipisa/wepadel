@@ -29,7 +29,7 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
         return montoPagadoEnPesos.divide(BigDecimal.valueOf(100)).intValue();
     }
 
-    public BigDecimal calcularDescuento(int puntosUsados, Long usuarioId) {
+    public BigDecimal calcularDescuentoPorPuntos(int puntosUsados, Long usuarioId) {
         SistemaPuntos sistema = sistemaPuntosRepository.findByUsuarioId(usuarioId)
                 .orElseThrow(() -> new RuntimeException("El usuario no tiene sistema de puntos inicializado"));
 

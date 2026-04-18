@@ -12,7 +12,7 @@ public interface SistemaPuntosService {
     public int calcularPuntosGenerados(BigDecimal montoPagadoEnPesos);
     //calcula cuantos puntos genera una compra. no negativos. no usar más puntos de los que tiene
 
-    public BigDecimal calcularDescuento(int puntosUsados, Long usuarioId);
+    public BigDecimal calcularDescuentoPorPuntos(int puntosUsados, Long usuarioId);
     //convierte puntos en $
 
     public Optional<SistemaPuntos> sumarPuntos(Long usuarioId, int puntosASumar);
