@@ -7,6 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.uade.tpo.wepadel.entity.SistemaPuntos;
+import com.uade.tpo.wepadel.exceptions.PuntosInsuficientesException;
+import com.uade.tpo.wepadel.exceptions.PuntosNegativosException;
+import com.uade.tpo.wepadel.exceptions.SistemaPuntosNotFoundException;
 import com.uade.tpo.wepadel.repository.SistemaPuntosRepository;
 
 @Service
@@ -30,25 +33,17 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
     }
 
     public BigDecimal calcularDescuentoPorPuntos(int puntosUsados, Long usuarioId) {
-        SistemaPuntos sistema = sistemaPuntosRepository.findByUsuarioId(usuarioId)
-                .orElseThrow(() -> new RuntimeException("El usuario no tiene sistema de puntos inicializado"));
+    SistemaPuntos sistema = sistemaPuntosRepository.findByUsuarioId(usuarioId)
+            .orElseThrow(SistemaPuntosNotFoundException::new);
 
-        if (puntosUsados < 0) {
-            throw new RuntimeException("La cantidad de puntos a usar no puede ser negativa");
-        }
-
-        if (puntosUsados > sistema.getCantidad()) {
-            throw new RuntimeException("El usuario no tiene suficientes puntos");
-        }
+        if (puntosUsados < 0) throw new PuntosNegativosException();
+        if (puntosUsados > sistema.getCantidad()) throw new PuntosInsuficientesException();
 
         return BigDecimal.valueOf((long) puntosUsados * sistema.getConversion());
     }
 
     public Optional<SistemaPuntos> sumarPuntos(Long usuarioId, int puntosASumar) {
-        if (puntosASumar < 0) {
-            throw new RuntimeException("No se pueden sumar puntos negativos");
-        }
-
+        if (puntosASumar < 0) throw new PuntosNegativosException();
         return sistemaPuntosRepository.findByUsuarioId(usuarioId).map(sistema -> {
             sistema.setCantidad(sistema.getCantidad() + puntosASumar);
             return sistemaPuntosRepository.save(sistema);
@@ -56,15 +51,9 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
     }
 
     public Optional<SistemaPuntos> restarPuntos(Long usuarioId, int puntosARestar) {
-        if (puntosARestar < 0) {
-            throw new RuntimeException("No se pueden restar puntos negativos");
-        }
-
+        if (puntosARestar < 0) throw new PuntosNegativosException();
         return sistemaPuntosRepository.findByUsuarioId(usuarioId).map(sistema -> {
-            if (puntosARestar > sistema.getCantidad()) {
-                throw new RuntimeException("No hay suficientes puntos para canjear");
-            }
-
+            if (puntosARestar > sistema.getCantidad()) throw new PuntosInsuficientesException();
             sistema.setCantidad(sistema.getCantidad() - puntosARestar);
             return sistemaPuntosRepository.save(sistema);
         });
