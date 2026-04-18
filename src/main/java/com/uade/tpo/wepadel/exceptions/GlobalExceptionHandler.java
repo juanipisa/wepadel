@@ -55,6 +55,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleCantidadInvalida(CantidadInvalidaException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad debe ser mayor a 0");
     }
+    
+    @ExceptionHandler(CarritoVacioException.class)
+    public ResponseEntity<Object> handleCarritoVacio(CarritoVacioException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El carrito está vacío");
+    }
 
     // ESPECÍFICAS DE PRODUCTO/STOCK
 

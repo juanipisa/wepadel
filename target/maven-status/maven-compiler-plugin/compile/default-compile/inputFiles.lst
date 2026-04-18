@@ -30,6 +30,7 @@ C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exception
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\CantidadInvalidaException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\CarritoItemNotFoundException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\CarritoNotFoundException.java
+C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\CarritoVacioException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\CategoriaDuplicateException.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\GlobalExceptionHandler.java
 C:\Users\juani\Desktop\APIS\wepadel\src\main\java\com\uade\tpo\wepadel\exceptions\ImagenNotFoundException.java
