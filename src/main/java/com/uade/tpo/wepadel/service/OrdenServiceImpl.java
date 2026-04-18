@@ -23,6 +23,7 @@ import com.uade.tpo.wepadel.exceptions.CarritoNotFoundException;
 import com.uade.tpo.wepadel.exceptions.CarritoVacioException;
 import com.uade.tpo.wepadel.exceptions.OrdenCantBeCancelledException;
 import com.uade.tpo.wepadel.exceptions.OrdenNotFoundException;
+import com.uade.tpo.wepadel.exceptions.PuntosCanjeInvalidoException;
 import com.uade.tpo.wepadel.exceptions.StockInsuficienteException;
 import com.uade.tpo.wepadel.exceptions.StockNotFoundException;
 import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
@@ -68,13 +69,17 @@ public class OrdenServiceImpl implements OrdenService {
 
     @Transactional
     public Orden createOrden(OrdenRequest request) {
-    
         Usuario usuario = usuarioRepository.findById(request.getUsuario())
                 .orElseThrow(UsuarioNotFoundException::new);
     
         Carrito carrito = carritoRepository.findByUsuario(usuario)
                 .orElseThrow(CarritoNotFoundException::new);
-    
+        
+        if (Boolean.TRUE.equals(request.getUsaPuntos())
+                && (request.getPuntosUsados() == null || request.getPuntosUsados() <= 0)) {
+            throw new PuntosCanjeInvalidoException();
+        }
+
         if (carrito.getItems().isEmpty()) {
             throw new CarritoVacioException();
         }
@@ -126,10 +131,12 @@ public class OrdenServiceImpl implements OrdenService {
                 .orElseThrow(OrdenNotFoundException::new);
     
         if (orden.getEstado() != EstadoOrdenEnum.CONFIRMADA) {
-            throw new OrdenCantBeCancelledException();
+            throw new OrdenCantBeCancelledException(
+                    "Solo se pueden cancelar órdenes en estado CONFIRMADA");
         }
         if (orden.getFechaCompra().isBefore(LocalDateTime.now().minusHours(24))) {
-            throw new OrdenCantBeCancelledException();
+            throw new OrdenCantBeCancelledException(
+                    "Solo se puede cancelar dentro de las 24 horas posteriores a la compra");
         }
     
         orden.setEstado(EstadoOrdenEnum.CANCELADA);
