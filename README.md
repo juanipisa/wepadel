@@ -60,6 +60,10 @@ La API queda disponible en `http://localhost:8080`. Las tablas se crean automát
 - Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
 - Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos de la venta sin borrarlos del sistema.
 - El sistema debe verificar que el mail tenga un formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial para garantizar la integridad y seguridad de la cuenta del usuario.
+- Un producto puede tener múltiples descuentos, pero solo uno puede estar vigente a la vez.
+- Un descuento es vigente si `activo = true` y la fecha actual está entre `fechaInicio` y `fechaFin`.
+- El descuento se aplica automáticamente al calcular el subtotal del carrito.
+- El porcentaje de descuento se aplica sobre el precio base del producto.
 
 ## 🏗️ Arquitectura
 
@@ -105,6 +109,7 @@ TBC
 - PRODUCTO
 - STOCK
 - IMAGEN *(binario en columna BLOB)*
+- DESCUENTO
 
 Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O_wKtDfw2Tl/view?usp=sharing
 
@@ -149,6 +154,15 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `POST` | `/productos` | Crear producto | ADMINISTRADOR |
 | `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
 | `GET` | `/productos/{productoId}/imagenes` | Listar imágenes del producto (metadatos + Base64) | — |
+
+### Recurso: Descuentos
+
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|------|
+| `POST` | `/descuentos` | Crear un descuento para un producto | ADMINISTRADOR |
+| `GET` | `/descuentos/{id}` | Obtener un descuento por id | – |
+| `GET` | `/descuentos/producto/{productoId}` | Obtener todos los descuentos de un producto | – |
+| `DELETE` | `/descuentos/{id}` | Eliminar un descuento | ADMINISTRADOR |
 
 ### Recurso: Imágenes
 | Método | Endpoint | Descripción | Rol |
