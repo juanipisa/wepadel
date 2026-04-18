@@ -55,6 +55,7 @@ public class DescuentoServiceImpl implements DescuentoService {
         descuentoRepository.deleteById(id);
     }
 
+    @Override
     public Optional<Descuento> getDescuentoVigente(Long productoId) {
         LocalDateTime ahora = LocalDateTime.now();
         return descuentoRepository.findByProductoId(productoId)

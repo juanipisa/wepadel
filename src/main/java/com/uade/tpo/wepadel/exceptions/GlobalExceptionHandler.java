@@ -112,6 +112,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DescuentoNotFoundException.class)
     public ResponseEntity<Object> handleDescuentoNotFound(DescuentoNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, "Descuento no encontrado");
+    }
+
     // SISTEMA DE PUNTOS
     
     @ExceptionHandler(SistemaPuntosNotFoundException.class)
