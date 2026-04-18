@@ -112,6 +112,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DescuentoNotFoundException.class)
     public ResponseEntity<Object> handleDescuentoNotFound(DescuentoNotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, "Descuento no encontrado");
+    // SISTEMA DE PUNTOS
+    
+    @ExceptionHandler(SistemaPuntosNotFoundException.class)
+    public ResponseEntity<Object> handleSistemaPuntosNotFound(SistemaPuntosNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "El usuario no tiene sistema de puntos inicializado");
+    }
+
+    @ExceptionHandler(PuntosInsuficientesException.class)
+    public ResponseEntity<Object> handlePuntosInsuficientes(PuntosInsuficientesException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El usuario no tiene suficientes puntos");
+    }
+
+    @ExceptionHandler(PuntosNegativosException.class)
+    public ResponseEntity<Object> handlePuntosNegativos(PuntosNegativosException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad de puntos no puede ser negativa");
     }
 
     // AUX
