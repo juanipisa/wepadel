@@ -54,20 +54,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public void validarUsuario(String email, String password) {
-        if (email == null || password == null) {
-            throw new InvalidUserDataException("Email y contraseña son obligatorios");
-        }
-        validarMailDuplicado(email, Optional.empty());
-        validarFormatoMail(email);
-        validarFormatoPassword(password);
-    }
-
     private void validarActualizacion(Long usuarioId, UsuarioRequest request) {
         String mail = request.getMail();
         String password = request.getPassword();
         if (mail != null) {
-            validarMailDuplicado(mail, Optional.of(usuarioId));
+            validarMailDuplicado(mail, usuarioId);
             validarFormatoMail(mail);
         }
         if (password != null) {
@@ -75,21 +66,13 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
-    private void validarMailDuplicado(String email, Optional<Long> excluirUsuarioId) {
-        if (excluirUsuarioId.isEmpty()) {
-            if (usuarioRepository.findByMail(email).isPresent()) {
-                throw new UsuarioDuplicateException("El email '" + email + "' ya se encuentra registrado");
-            }
-            return;
-        }
-        Long id = excluirUsuarioId.get();
+    private void validarMailDuplicado(String email, Long excluirUsuarioId) {
         if (usuarioRepository.findByMail(email)
-                .filter(u -> !u.getId().equals(id))
+                .filter(u -> !u.getId().equals(excluirUsuarioId))
                 .isPresent()) {
             throw new UsuarioDuplicateException("El email ya se encuentra registrado");
         }
     }
-
     private void validarFormatoMail(String email) {
         if (!email.matches(REGEX_EMAIL)) {
             throw new InvalidUserDataException("El formato del mail no es válido");

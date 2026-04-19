@@ -19,6 +19,8 @@ import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
 import com.uade.tpo.wepadel.service.ImagenService;
 import com.uade.tpo.wepadel.service.ProductoService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("productos")
 public class ProductoController {
@@ -40,11 +42,11 @@ public class ProductoController {
     }
 
     @PostMapping
-    public ResponseEntity<Producto> createProducto(@RequestBody ProductoRequest request) {
+    public ResponseEntity<Producto> createProducto(@Valid @RequestBody ProductoRequest request) {
         Producto result = productoService.createProducto(request);
         return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
     }
-
+    
     @PutMapping("/{productoId}")
     public ResponseEntity<Producto> updateProducto(@PathVariable Long productoId, @RequestBody ProductoRequest request) {
         return productoService.updateProducto(productoId, request)

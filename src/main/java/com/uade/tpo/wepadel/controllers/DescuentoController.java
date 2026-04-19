@@ -17,6 +17,8 @@ import com.uade.tpo.wepadel.entity.Descuento;
 import com.uade.tpo.wepadel.entity.dto.DescuentoRequest;
 import com.uade.tpo.wepadel.service.DescuentoService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/descuentos")
 public class DescuentoController {
@@ -25,7 +27,7 @@ public class DescuentoController {
     private DescuentoService descuentoService;
 
     @PostMapping
-    public ResponseEntity<Descuento> createDescuento(@RequestBody DescuentoRequest request) {
+    public ResponseEntity<Descuento> createDescuento(@Valid @RequestBody DescuentoRequest request) {
         Descuento descuento = descuentoService.createDescuento(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(descuento);
     }
