@@ -31,7 +31,7 @@ public class AuthenticationService {
   public AuthenticationResponse register(RegisterRequest request) {
     if (usuarioRepository.findByMail(request.getEmail()).isPresent()) {
       throw new UsuarioDuplicateException("El email ya se encuentra registrado");
-  }
+    }
     var user = Usuario.builder()
         .nombreApellido(request.getNombreApellido())
         .mail(request.getEmail())
