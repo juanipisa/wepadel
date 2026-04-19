@@ -42,11 +42,11 @@ mvnw.cmd spring-boot:run
 La API queda disponible en `http://localhost:8080`. Las tablas se crean automáticamente al iniciar.
 
 ## 🧠 Lógica de negocio
-- Los usuarios invitados pueden ver los diferentes productos que ofrece WePadel; los registrados ademas podran agregar esos mismos productos al carrito, acceder a su perfil, historial de compras y beneficios de puntos.
+- Los usuarios invitados pueden ver los diferentes productos que ofrece WePadel; los registrados además podrán agregar esos mismos productos al carrito, acceder a su perfil, historial de compras y beneficios de puntos.
 - El administrador tiene credenciales únicas, proporcionadas por el equipo técnico, una vista exclusiva para gestionar stock y precios, y no puede realizar compras ni tener un carrito.
-- Al registrar un usuario cliente, se crea automáticamente su carrito; para los invitados, solamente persiste en el frontend.
+- Al registrar un usuario cliente, se crea automáticamente su carrito y su sistema de puntos.
 - El carrito del usuario registrado persiste por 7 días; si no se concreta la compra en ese plazo, se vacía automáticamente.
-- El subtotal del carrito se actualiza en tiempo real según el precio actual de los productos en la base de datos.
+- El subtotal del carrito se actualiza en tiempo real según el precio actual de los productos, aplicando automáticamente los descuentos vigentes.
 - Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
 - Exclusivo para clientes registrados; se suman puntos al confirmar una orden y se restan si se utilizan como parte de pago o si la orden se cancela.
 - La orden se genera únicamente al hacer clic en "Pagar"; si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
@@ -58,11 +58,11 @@ La API queda disponible en `http://localhost:8080`. Las tablas se crean automát
 - Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
 - Cada producto puede tener varias imágenes: se almacenan en base como BLOB, se suben por `multipart/form-data` y en las respuestas JSON se exponen en Base64 (`archivoBase64`) para consumo desde el frontend.
 - Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
-- Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos de la venta sin borrarlos del sistema.
+- Los productos pueden desactivarse mediante el flag `estaHabilitado` para ocultarlos de la venta sin borrarlos del sistema.
 - El sistema debe verificar que el mail tenga un formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial para garantizar la integridad y seguridad de la cuenta del usuario.
 - Un producto puede tener múltiples descuentos, pero solo uno puede estar vigente a la vez.
 - Un descuento es vigente si `activo = true` y la fecha actual está entre `fechaInicio` y `fechaFin`.
-- El descuento se aplica automáticamente al calcular el subtotal del carrito.
+- El descuento se aplica automáticamente al calcular el subtotal del carrito y al confirmar la orden, registrándose el precio con descuento en ORDEN_ITEM.
 - El porcentaje de descuento se aplica sobre el precio base del producto.
 
 ## 🏗️ Arquitectura
@@ -116,6 +116,13 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 ---
 
 ## 📡 Endpoints
+
+### Recurso: Auth
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `POST` | `/api/v1/auth/register` | Registrar usuario y devolver token | — |
+| `POST` | `/api/v1/auth/authenticate` | Autenticar credenciales (Login) y devolver JWT | — |
+
 ### Recurso: Usuarios
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
@@ -153,53 +160,48 @@ Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O
 | `GET` | `/productos/{productoId}` | Obtener detalle de producto | — |
 | `POST` | `/productos` | Crear producto | ADMINISTRADOR |
 | `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
-| `GET` | `/productos/{productoId}/imagenes` | Listar imágenes del producto (metadatos + Base64) | — |
-
-### Recurso: Descuentos
-
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|------|
-| `POST` | `/descuentos` | Crear un descuento para un producto | ADMINISTRADOR |
-| `GET` | `/descuentos/{id}` | Obtener un descuento por id | – |
-| `GET` | `/descuentos/producto/{productoId}` | Obtener todos los descuentos de un producto | – |
-| `DELETE` | `/descuentos/{id}` | Eliminar un descuento | ADMINISTRADOR |
 
 ### Recurso: Imágenes
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
 | `GET` | `/imagenes/{imagenId}` | Obtener una imagen por id | — |
-| `POST` | `/imagenes` | Subir imagen asociada a un producto | — |
+| `GET` | `/imagenes/producto/{productoId}` | Listar imágenes de un producto | — |
+| `POST` | `/imagenes` | Subir imagen asociada a un producto | ADMINISTRADOR |
 
-### Recurso: Stocks
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/stocks/producto/{productoId}` | Obtener stock de un producto |
-| `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto *(requiere ADMIN)* |
-
-### Recurso: Auth
+### Recurso: Descuentos
 | Método | Endpoint | Descripción | Rol |
 |--------|----------|-------------|-----|
-| `POST` | `/auth/authenticate` | Autenticar credenciales (Login) y devolver JWT | — |
-| `POST` | `/auth/register` | Registrar usuario y devolver token | — |
+| `POST` | `/descuentos` | Crear un descuento para un producto | ADMINISTRADOR |
+| `GET` | `/descuentos/{id}` | Obtener un descuento por id | — |
+| `GET` | `/descuentos/producto/{productoId}` | Obtener todos los descuentos de un producto | — |
+| `DELETE` | `/descuentos/{id}` | Eliminar un descuento | ADMINISTRADOR |
 
-# 🗺️ Roadmap y tareas del proyecto
+### Recurso: Stocks
+| Método | Endpoint | Descripción | Rol |
+|--------|----------|-------------|-----|
+| `GET` | `/stocks/producto/{productoId}` | Obtener stock de un producto | — |
+| `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto | ADMINISTRADOR |
 
-El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto. Anotarse a las tareas que van a realizar. 
+---
+
+## 🗺️ Roadmap y tareas del proyecto
+
+El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto. Anotarse a las tareas que van a realizar.
 
 ### ✅ Entrega #1 — Modelo de datos y entidades `(vence 07/04)`
-- [x] Entidades JPA creadas y mapeadas 
-- [x] Base de datos conectada (MySQL) 
-- [x] Endpoints básicos funcionando 
-- [x] DER (Diagrama Entidad-Relación) 
+- [x] Entidades JPA creadas y mapeadas
+- [x] Base de datos conectada (MySQL)
+- [x] Endpoints básicos funcionando
+- [x] DER (Diagrama Entidad-Relación)
 - [ ] Diagrama UML de clases
 
 ### 🔐 Entrega #2 — Seguridad con JWT `(vence 22/04)`
 - [x] Integrar Spring Security
 - [x] Implementar autenticación con JWT
-- [x] Endpoint de login (`POST /auth/authenticate`)
-- [x] Endpoint de registro que devuelva token
+- [x] Endpoint de login (`POST /api/v1/auth/authenticate`)
+- [x] Endpoint de registro que devuelva token (`POST /api/v1/auth/register`)
 - [x] Hashear passwords con BCrypt
-- [x] Proteger endpoints según rol (CLIENTE / ADMINISTRADOR)
+- [ ] Proteger endpoints según rol (CLIENTE / ADMINISTRADOR)
 - [x] Implementar `UserDetails` en la entidad `Usuario`
 
 ### 🎨 Entrega #3 — Maquetación visual del frontend `(vence 20/05)`
@@ -225,17 +227,13 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Refactorizar componentes para usar el store global
 - [ ] Integrar middleware si es necesario
 
+---
 
 ## 🐛 Bugs y pendientes
 
 - [ ] Crear UML
-- [ ] Actualizar lógica de endpoints en base a nueva definición
-- [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia).
-- [ ] Crear excepciones
-- [x] Integración JWT
-- [ ] Definiciones JWT definidas en tabla de endpoints pasadas a código
-- [ ] Actualizar services con lógica de negocio
-- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401).
+- [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia)
+- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401)
 
 ---
 
