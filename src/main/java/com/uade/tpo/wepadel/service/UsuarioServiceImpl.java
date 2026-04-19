@@ -3,6 +3,8 @@ package com.uade.tpo.wepadel.service;
 import java.util.List;
 import java.util.Optional;
 
+import com.uade.tpo.wepadel.exceptions.InvalidUserDataException;
+import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,7 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     public Usuario updateUsuario(Long usuarioId, UsuarioRequest request) {
-        validarUsuario(request);
+        validarUsuario(request.getMail(), request.getPassword());
 
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new UsuarioNotFoundException());
@@ -40,18 +42,23 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    private void validarUsuario(UsuarioRequest request) {
-        // 1. Validar Mail (formato nombre@algo.com)
-        String regexEmail = "^[A-Za-z0-9+_.-]+@(.+)$";
-        if (request.getMail() == null || !request.getMail().matches(regexEmail)) {
-            throw new RuntimeException("El formato del mail no es válido");
+    public void validarUsuario(String email, String password) {
+        // 1. Validar si ya existe un usuario con ese email (Duplicado)
+        if (usuarioRepository.findByMail(email).isPresent()) {
+            throw new UsuarioDuplicateException("El email '" + email + "' ya se encuentra registrado");
         }
 
-        // 2. Validar Contraseña (Min 12 caracteres, Mayúscula, Número y Símbolo)
-        // Explicación: (?=.*[0-9]) busca número, (?=.*[a-z]) minúscula, (?=.*[A-Z]) mayúscula, (?=.*[@#$%^&+=!]) símbolo
+        // 2. Validar Formato Mail (nombre@algo.com)
+        String regexEmail = "^[A-Za-z0-9+_.-]+@(.+)$";
+        if (email == null || !email.matches(regexEmail)) {
+            throw new InvalidUserDataException("El formato del mail no es válido");
+        }
+
+        // 3. Validar Contraseña (Min 12 caracteres, Mayúscula, Número y Símbolo)
         String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{12,}$";
-        if (request.getPassword() == null || !request.getPassword().matches(regexPassword)) {
-            throw new RuntimeException("La contraseña debe tener 12+ caracteres, una mayúscula, un número y un símbolo");
+        if (password == null || !password.matches(regexPassword)) {
+            throw new InvalidUserDataException(
+                    "La contraseña debe tener al menos 12 caracteres, incluir una mayúscula, un número y un símbolo");
         }
     }
 

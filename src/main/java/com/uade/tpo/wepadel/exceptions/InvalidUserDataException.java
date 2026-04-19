@@ -3,9 +3,9 @@ package com.uade.tpo.wepadel.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class UsuarioDuplicateException extends RuntimeException {
-    public UsuarioDuplicateException(String message) {
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class InvalidUserDataException extends RuntimeException {
+    public InvalidUserDataException(String message) {
         super(message);
     }
 }

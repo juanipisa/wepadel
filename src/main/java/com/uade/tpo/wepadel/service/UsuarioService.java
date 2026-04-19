@@ -11,4 +11,5 @@ public interface UsuarioService {
     public List<Usuario> getUsuarios();
     public Usuario getUsuarioById(Long usuarioId);
     public Usuario updateUsuario(Long usuarioId, UsuarioRequest request);
+    public void validarUsuario(String email, String password);
 }
