@@ -10,6 +10,7 @@ import com.uade.tpo.wepadel.controllers.auth.AuthenticationResponse;
 import com.uade.tpo.wepadel.controllers.auth.RegisterRequest;
 import com.uade.tpo.wepadel.controllers.config.JwtService;
 import com.uade.tpo.wepadel.entity.Usuario;
+import com.uade.tpo.wepadel.entity.RolEnum;
 import com.uade.tpo.wepadel.exceptions.BadCredentialsException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
 
@@ -23,6 +24,8 @@ public class AuthenticationService {
   private final JwtService jwtService;
   private final AuthenticationManager authenticationManager;
   private final UsuarioService usuarioService;
+  private final CarritoService carritoService;
+  private final SistemaPuntosService sistemaPuntosService;
 
   public AuthenticationResponse register(RegisterRequest request) {
     // Validar formato y duplicados usando el service de Usuario
@@ -36,6 +39,13 @@ public class AuthenticationService {
         .build();
 
     usuarioRepository.save(user);
+
+    // Si el usuario es CLIENTE, le creamos su Carrito y su Sistema de Puntos
+    if (user.getRol() == RolEnum.CLIENTE) {
+      carritoService.createCarrito(user.getId());
+      sistemaPuntosService.createSistemaPuntos(user);
+    }
+
     var jwtToken = jwtService.generateToken(user);
     return AuthenticationResponse.builder()
         .accessToken(jwtToken)
