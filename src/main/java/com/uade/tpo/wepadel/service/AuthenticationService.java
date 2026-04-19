@@ -12,6 +12,7 @@ import com.uade.tpo.wepadel.controllers.config.JwtService;
 import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.RolEnum;
 import com.uade.tpo.wepadel.exceptions.BadCredentialsException;
+import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -28,9 +29,9 @@ public class AuthenticationService {
   private final SistemaPuntosService sistemaPuntosService;
 
   public AuthenticationResponse register(RegisterRequest request) {
-    // Validar formato y duplicados usando el service de Usuario
-    usuarioService.validarUsuario(request.getEmail(), request.getPassword());
-
+    if (usuarioRepository.findByMail(request.getEmail()).isPresent()) {
+      throw new UsuarioDuplicateException("El email ya se encuentra registrado");
+    }
     var user = Usuario.builder()
         .nombreApellido(request.getNombreApellido())
         .mail(request.getEmail())

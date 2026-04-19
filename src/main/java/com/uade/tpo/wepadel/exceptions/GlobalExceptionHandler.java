@@ -171,12 +171,73 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
     }
 
-    // Para errores de validación de la orden
+    // Para errores de datos de entrada
     private String mensajeValidacionEntrada(ObjectError error) {
         if (!(error instanceof FieldError fe)) {
             return error.getDefaultMessage() != null ? error.getDefaultMessage() : "Datos de entrada inválidos";
         }
         String field = fe.getField();
+        
+        // RegisterRequest
+        if ("nombreApellido".equals(field) && matchesConstraint(fe, "NotBlank")) {
+            return "El nombre y apellido es obligatorio";
+        }
+        if ("email".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El email es obligatorio";
+        }
+        if ("email".equals(field) && matchesConstraint(fe, "Email")) {
+            return "El formato del email no es válido";
+        }
+        if ("password".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "La contraseña es obligatoria";
+        }
+        if ("password".equals(field) && matchesConstraint(fe, "Size")) {
+            return "La contraseña debe tener al menos 12 caracteres";
+        }
+        if ("password".equals(field) && matchesConstraint(fe, "Pattern")) {
+            return "La contraseña debe tener 12+ caracteres, una mayúscula, un número y un símbolo";
+        }
+        if ("role".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El rol es obligatorio";
+        }
+        
+        // DescuentoRequest
+        if ("productoId".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El producto es obligatorio";
+        }
+        if ("porcentaje".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El porcentaje es obligatorio";
+        }
+        if ("porcentaje".equals(field) && matchesConstraint(fe, "DecimalMin")) {
+            return "El porcentaje debe ser mayor a 0";
+        }
+        if ("fechaInicio".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "La fecha de inicio es obligatoria";
+        }
+        if ("fechaFin".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "La fecha de fin es obligatoria";
+        }
+        
+        // CarritoItemRequest
+        if ("productoId".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El producto es obligatorio";
+        }
+        if ("cantidad".equals(field) && matchesConstraint(fe, "Min")) {
+            return "La cantidad debe ser mayor a 0";
+        }
+        
+        // ProductoRequest
+        if ("descripcion".equals(field) && matchesConstraint(fe, "NotBlank")) {
+            return "La descripción es obligatoria";
+        }
+        if ("precio".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El precio es obligatorio";
+        }
+        if ("precio".equals(field) && matchesConstraint(fe, "DecimalMin")) {
+            return "El precio debe ser mayor a 0";
+        }
+    
+        // OrdenRequest
         if ("usuario".equals(field) && matchesConstraint(fe, "NotNull")) {
             return "El campo usuario es obligatorio";
         }

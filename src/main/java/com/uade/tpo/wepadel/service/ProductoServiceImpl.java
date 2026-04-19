@@ -34,7 +34,6 @@ public class ProductoServiceImpl implements ProductoService {
     }
 
     public Producto createProducto(ProductoRequest request) {
-        validarProducto(request);
 
         Producto producto = productoRepository.save(
                 new Producto(request.getDescripcion(), request.getPrecio(), request.getCategoria())
@@ -69,15 +68,6 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         return Optional.of(productoRepository.save(producto));
-    }
-
-    private void validarProducto(ProductoRequest request) {
-        if (request.getDescripcion() == null || request.getDescripcion().isBlank()) {
-            throw new ProductoInvalidoException("La descripción no puede estar vacía");
-        }
-        if (request.getPrecio() == null || request.getPrecio().compareTo(BigDecimal.ZERO) <= 0) {
-            throw new ProductoInvalidoException("El precio debe ser mayor a cero");
-        }
     }
 
 }

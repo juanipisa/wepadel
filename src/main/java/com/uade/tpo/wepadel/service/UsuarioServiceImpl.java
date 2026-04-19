@@ -1,7 +1,6 @@
 package com.uade.tpo.wepadel.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.dto.UsuarioRequest;
-import com.uade.tpo.wepadel.exceptions.InvalidUserDataException;
+import com.uade.tpo.wepadel.exceptions.UsuarioDatosInvalidosException;
 import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
@@ -54,20 +53,11 @@ public class UsuarioServiceImpl implements UsuarioService {
         return usuarioRepository.save(usuario);
     }
 
-    public void validarUsuario(String email, String password) {
-        if (email == null || password == null) {
-            throw new InvalidUserDataException("Email y contraseña son obligatorios");
-        }
-        validarMailDuplicado(email, Optional.empty());
-        validarFormatoMail(email);
-        validarFormatoPassword(password);
-    }
-
     private void validarActualizacion(Long usuarioId, UsuarioRequest request) {
         String mail = request.getMail();
         String password = request.getPassword();
         if (mail != null) {
-            validarMailDuplicado(mail, Optional.of(usuarioId));
+            validarMailDuplicado(mail, usuarioId);
             validarFormatoMail(mail);
         }
         if (password != null) {
@@ -75,30 +65,22 @@ public class UsuarioServiceImpl implements UsuarioService {
         }
     }
 
-    private void validarMailDuplicado(String email, Optional<Long> excluirUsuarioId) {
-        if (excluirUsuarioId.isEmpty()) {
-            if (usuarioRepository.findByMail(email).isPresent()) {
-                throw new UsuarioDuplicateException("El email '" + email + "' ya se encuentra registrado");
-            }
-            return;
-        }
-        Long id = excluirUsuarioId.get();
+    private void validarMailDuplicado(String email, Long excluirUsuarioId) {
         if (usuarioRepository.findByMail(email)
-                .filter(u -> !u.getId().equals(id))
+                .filter(u -> !u.getId().equals(excluirUsuarioId))
                 .isPresent()) {
             throw new UsuarioDuplicateException("El email ya se encuentra registrado");
         }
     }
-
     private void validarFormatoMail(String email) {
         if (!email.matches(REGEX_EMAIL)) {
-            throw new InvalidUserDataException("El formato del mail no es válido");
+            throw new UsuarioDatosInvalidosException("El formato del mail no es válido");
         }
     }
 
     private void validarFormatoPassword(String password) {
         if (!password.matches(REGEX_PASSWORD)) {
-            throw new InvalidUserDataException(
+            throw new UsuarioDatosInvalidosException(
                     "La contraseña debe tener al menos 12 caracteres, incluir una mayúscula, un número y un símbolo");
         }
     }
