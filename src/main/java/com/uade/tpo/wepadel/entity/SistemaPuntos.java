@@ -19,12 +19,8 @@ public class SistemaPuntos {
     public SistemaPuntos() {
     }
 
-    // Constructor para crear SistemaPuntos cuando usuario CLIENTE se registra
-    // Se crea SOLO si el usuario está registrado Y es CLIENTE
-    public SistemaPuntos(Usuario usuario, int conversion) {
+    public SistemaPuntos(Usuario usuario) {
         this.usuario = usuario;
-        this.cantidad = 0;  // Inicia con 0 puntos acumulados
-        this.conversion = conversion;
     }
 
     @Id
@@ -39,7 +35,8 @@ public class SistemaPuntos {
     @Column(name = "cantidad", nullable = false)
     private int cantidad = 0;
 
+    /** Pesos por cada punto al canjear (ej. 1 punto = $5). Valor inicial al crear la fila. */
     @Column(name = "conversion", nullable = false)
-    private int conversion; // TODO: hacer la lógica de conversión
+    private int conversion = 5;
 
 }

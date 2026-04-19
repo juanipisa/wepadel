@@ -22,7 +22,7 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
     private SistemaPuntosRepository sistemaPuntosRepository;
 
     public SistemaPuntos createSistemaPuntos(Usuario usuario) {
-        return sistemaPuntosRepository.save(new SistemaPuntos(usuario, 5));
+        return sistemaPuntosRepository.save(new SistemaPuntos(usuario));
     }
 
     public Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId) {
