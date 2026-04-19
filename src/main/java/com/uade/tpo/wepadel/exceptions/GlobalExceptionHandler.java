@@ -2,6 +2,9 @@ package com.uade.tpo.wepadel.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import java.util.LinkedHashMap;
@@ -34,6 +37,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "El mail ya está registrado");
     }
 
+    @ExceptionHandler(UsuarioDatosInvalidosException.class)
+    public ResponseEntity<Object> handleUsuarioDatosInvalidos(UsuarioDatosInvalidosException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
     @ExceptionHandler(AccesoDenegadoException.class)
     public ResponseEntity<Object> handleAccesoDenegado(AccesoDenegadoException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, "No tenés permiso para realizar esta acción");
@@ -54,6 +62,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CantidadInvalidaException.class)
     public ResponseEntity<Object> handleCantidadInvalida(CantidadInvalidaException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad debe ser mayor a 0");
+    }
+    
+    @ExceptionHandler(CarritoVacioException.class)
+    public ResponseEntity<Object> handleCarritoVacio(CarritoVacioException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El carrito está vacío");
     }
 
     // ESPECÍFICAS DE PRODUCTO/STOCK
@@ -88,7 +101,34 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "La categoría ya existe");
     }
 
+    // ÓRDENES
+
+    @ExceptionHandler(OrdenNotFoundException.class)
+    public ResponseEntity<Object> handleOrdenNotFound(OrdenNotFoundException ex) {
+        return buildResponse(HttpStatus.NOT_FOUND, "Orden no encontrada");
+    }
+
+    @ExceptionHandler(OrdenCantBeCancelledException.class)
+    public ResponseEntity<Object> handleOrdenCantBeCancelled(OrdenCantBeCancelledException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(PuntosCanjeInvalidoException.class)
+    public ResponseEntity<Object> handlePuntosCanjeInvalido(PuntosCanjeInvalidoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST,
+                "Si usás puntos, debés indicar puntosUsados mayor a cero");
+    }
+
     // GENÉRICAS DEL SISTEMA
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
+        String message = ex.getBindingResult().getAllErrors().stream()
+                .findFirst()
+                .map(this::mensajeValidacionEntrada)
+                .orElse("Datos de entrada inválidos");
+        return buildResponse(HttpStatus.BAD_REQUEST, message);
+    }
 
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<Object> handleMethodNotAllowed(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
@@ -100,12 +140,6 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleJsonError(org.springframework.http.converter.HttpMessageNotReadableException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Error en el formato del JSON o valor de enum inválido");
     }
-
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Object> handleRuntime(RuntimeException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
 
     // DESCUENTO
     
@@ -129,6 +163,45 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(PuntosNegativosException.class)
     public ResponseEntity<Object> handlePuntosNegativos(PuntosNegativosException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad de puntos no puede ser negativa");
+    }
+
+    // Para errores no contemplados 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleUnhandled(Exception ex) {
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno del servidor");
+    }
+
+    // Para errores de validación de la orden
+    private String mensajeValidacionEntrada(ObjectError error) {
+        if (!(error instanceof FieldError fe)) {
+            return error.getDefaultMessage() != null ? error.getDefaultMessage() : "Datos de entrada inválidos";
+        }
+        String field = fe.getField();
+        if ("usuario".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "El campo usuario es obligatorio";
+        }
+        if ("direccion".equals(field) && matchesConstraint(fe, "NotBlank")) {
+            return "La dirección es obligatoria";
+        }
+        if ("cp".equals(field) && matchesConstraint(fe, "NotBlank")) {
+            return "El código postal es obligatorio";
+        }
+        if ("montoEnvio".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "Solicitud incompleta: falta montoEnvio en el payload (debe calcularse y enviarse antes de confirmar la orden)";
+        }
+        if ("montoEnvio".equals(field) && matchesConstraint(fe, "DecimalMin")) {
+            return "montoEnvio inválido: el valor calculado no puede ser negativo";
+        }
+        return error.getDefaultMessage() != null ? error.getDefaultMessage() : "Datos de entrada inválidos";
+    }
+
+    private boolean matchesConstraint(FieldError fe, String suffix) {
+        for (String code : fe.getCodes()) {
+            if (code != null && code.endsWith(suffix)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // AUX

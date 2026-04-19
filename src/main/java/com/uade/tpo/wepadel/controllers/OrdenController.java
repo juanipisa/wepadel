@@ -2,7 +2,6 @@ package com.uade.tpo.wepadel.controllers;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +13,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
+
 import com.uade.tpo.wepadel.entity.Orden;
 import com.uade.tpo.wepadel.entity.dto.OrdenRequest;
+import com.uade.tpo.wepadel.exceptions.AccesoDenegadoException;
+import com.uade.tpo.wepadel.exceptions.OrdenNotFoundException;
 import com.uade.tpo.wepadel.service.OrdenService;
 
 @RestController
@@ -28,11 +31,11 @@ public class OrdenController {
     // Obtener una orden por ID
     @GetMapping("/{ordenId}")
     public ResponseEntity<Orden> getOrdenById(@PathVariable Long usuarioId, @PathVariable Long ordenId) {
-        Optional<Orden> orden = ordenService.getOrdenById(ordenId);
-        if (orden.isPresent()) {
-            return ResponseEntity.ok(orden.get());
+        Orden orden = ordenService.getOrdenById(ordenId).orElseThrow(OrdenNotFoundException::new);
+        if (!orden.getUsuario().getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(orden);
     }
 
     // Obtener historial de órdenes del usuario
@@ -43,9 +46,11 @@ public class OrdenController {
 
     // Crear orden (cuando el usuario hace clic en pagar)
     @PostMapping
-    public ResponseEntity<Object> createOrden(@PathVariable Long usuarioId, @RequestBody OrdenRequest ordenRequest) {
-        //TODO: Validar que usuarioId coincide con el del request
-        //TODO: Validar que usuario es CLIENTE (no ADMIN)
+    public ResponseEntity<Object> createOrden(@PathVariable Long usuarioId,
+            @Valid @RequestBody OrdenRequest ordenRequest) {
+        if (!ordenRequest.getUsuario().equals(usuarioId)) {
+            throw new AccesoDenegadoException();
+        }
         Orden result = ordenService.createOrden(ordenRequest);
         return ResponseEntity.created(URI.create("/usuarios/" + usuarioId + "/ordenes/" + result.getId())).body(result);
     }
@@ -53,12 +58,11 @@ public class OrdenController {
     // Cancelar orden (dentro de 24h)
     @PutMapping("/{ordenId}/cancelar")
     public ResponseEntity<Orden> cancelarOrden(@PathVariable Long usuarioId, @PathVariable Long ordenId) {
-        //TODO: Validar que usuarioId es el dueño de la orden
-        Optional<Orden> orden = ordenService.cancelarOrden(ordenId);
-        if (orden.isPresent()) {
-            return ResponseEntity.ok(orden.get());
+        Orden antes = ordenService.getOrdenById(ordenId).orElseThrow(OrdenNotFoundException::new);
+        if (!antes.getUsuario().getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException();
         }
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(ordenService.cancelarOrden(ordenId).orElseThrow());
     }
 
 }
