@@ -4,8 +4,10 @@ import java.math.BigDecimal;
 import java.util.Optional;
 
 import com.uade.tpo.wepadel.entity.SistemaPuntos;
+import com.uade.tpo.wepadel.entity.Usuario;
 
 public interface SistemaPuntosService {
+    public SistemaPuntos createSistemaPuntos(Usuario usuario);
     public Optional<SistemaPuntos> getPuntosByUsuarioId(Long usuarioId);
     //busca registro puntos usuario, lo devuelve o vacio
 
