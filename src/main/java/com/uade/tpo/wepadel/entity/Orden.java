@@ -94,9 +94,4 @@ public class Orden {
     @Column(name = "puntos_usados", nullable = false)
     private int puntosUsados = 0;
 
-    // Email para gestionar reembolsos
-    // Se envía formulario por email, no se guarda en BD
-    @Column(name = "mail_reembolsos")
-    private String mailReembolsos;
-
 }

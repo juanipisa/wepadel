@@ -42,6 +42,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
+    @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
+        return buildResponse(HttpStatus.UNAUTHORIZED, "Email o contraseña incorrectos");
+    }
+
     @ExceptionHandler(AccesoDenegadoException.class)
     public ResponseEntity<Object> handleAccesoDenegado(AccesoDenegadoException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, "No tenés permiso para realizar esta acción");

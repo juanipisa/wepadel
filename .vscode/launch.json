@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "WePadelApplication",
+            "request": "launch",
+            "mainClass": "com.uade.tpo.wepadel.WePadelApplication",
+            "projectName": "wepadel"
+        },
+        {
+            "type": "java",
             "name": "Spring Boot-WepadelApplication<wepadele>",
             "request": "launch",
             "cwd": "${workspaceFolder}",
