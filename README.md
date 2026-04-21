@@ -1,16 +1,19 @@
-# 🏓 E-commerce de Pádel
-E-commerce fullstack de productos de pádel. Backend en Spring Boot + MySQL, frontend en React con Redux en el marco de la materia Aplicaciones Interactivas, UADE.
+# 🏓 WePadel
 
-## 🎯 Objetivo del proyecto
-Construir una plataforma de venta online de productos de pádel donde los usuarios pueden navegar el catálogo, agregar productos al carrito y realizar compras.
+Backend de e-commerce de productos de pádel. Desarrollado con Spring Boot + MySQL, con autenticación JWT y autorización por roles.
 
-## 🚀 Cómo ejecutar el proyecto localmente
+**Materia:** Aplicaciones Interactivas — UADE  
+**Grupo 5** 
+**Repositorio:** https://github.com/juanipisa/wepadel
 
-### Requisitos previos
+---
+
+## Requisitos
+
 - Java 17
 - MySQL 8
 
-### Pasos
+## Configuración y ejecución
 
 **1. Clonar el repositorio**
 ```bash
@@ -23,23 +26,18 @@ cd wepadel
 CREATE DATABASE wepadel;
 ```
 
-**3. Configurar credenciales en** `src/main/resources/application.properties`
+**3. Configurar `src/main/resources/application.properties`**
 ```properties
-spring.application.name=wepadel
 spring.datasource.url=jdbc:mysql://localhost:3306/wepadel
-spring.datasource.driverClassName=com.mysql.jdbc.Driver
 spring.datasource.username=root
-spring.datasource.password=${DB_PASSWORD}
-spring.jpa.hibernate.ddl-auto=update
-spring.web.error.include-message=always
-spring.web.error.include-binding-errors=always
-application.security.jwt.secretKey=${JWT_SECRET_KEY}
-application.security.jwt.expiration=${JWT_EXPIRATION}
-spring.servlet.multipart.max-file-size=15MB
-spring.servlet.multipart.max-request-size=15MB
-```
+spring.datasource.password=TU_PASSWORD
 
-**4. Levantar el servidor**
+application.security.jwt.secretKey=TU_SECRET_KEY_BASE64
+application.security.jwt.expiration=86400000
+```
+> Las variables de entorno recomendadas son `DB_PASSWORD`, `JWT_SECRET_KEY` y `JWT_EXPIRATION`.
+
+**4. Levantar la aplicación**
 ```bash
 # Mac/Linux
 ./mvnw spring-boot:run
@@ -48,154 +46,76 @@ spring.servlet.multipart.max-request-size=15MB
 mvnw.cmd spring-boot:run
 ```
 
-La API queda disponible en `http://localhost:8080`. Las tablas se crean automáticamente al iniciar.
-
-## 🧠 Lógica de negocio
-- Los usuarios invitados pueden ver los diferentes productos que ofrece WePadel; los registrados además podrán agregar esos mismos productos al carrito, acceder a su perfil, historial de compras y beneficios de puntos.
-- El administrador tiene credenciales únicas, proporcionadas por el equipo técnico, una vista exclusiva para gestionar stock y precios, y no puede realizar compras ni tener un carrito.
-- Al registrar un usuario cliente, se crea automáticamente su carrito y su sistema de puntos.
-- El carrito del usuario registrado persiste por 7 días; si no se concreta la compra en ese plazo, se vacía automáticamente.
-- El subtotal del carrito se actualiza en tiempo real según el precio actual de los productos, aplicando automáticamente los descuentos vigentes.
-- Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
-- Exclusivo para clientes registrados; se suman puntos al confirmar una orden y se restan si se utilizan como parte de pago o si la orden se cancela.
-- La orden se genera únicamente al hacer clic en "Pagar"; si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
-- Un usuario invitado necesita registrarse y crear un usuario para poder realizar la orden.
-- Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
-- Al confirmar una compra, se registra el precio unitario del momento en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
-- Los clientes registrados pueden cancelar una compra y solicitar reembolso mediante formulario solo dentro de las primeras 24 horas.
-- Al confirmarse una cancelación, la orden pasa a estado CANCELADA, el stock de los productos se restaura y los puntos generados se eliminan.
-- Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador.
-- Cada producto puede tener varias imágenes: se almacenan en base como BLOB, se suben por `multipart/form-data` y en las respuestas JSON se exponen en Base64 (`archivoBase64`) para consumo desde el frontend.
-- Las categorías (PALETAS, ACCESORIOS, PELOTAS) son fijas y no pueden ser modificadas ni siquiera por el administrador.
-- Los productos pueden desactivarse mediante el flag `estaHabilitado` para ocultarlos de la venta sin borrarlos del sistema.
-- El sistema debe verificar que el mail tenga un formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial para garantizar la integridad y seguridad de la cuenta del usuario.
-- Un producto puede tener múltiples descuentos, pero solo uno puede estar vigente a la vez.
-- Un descuento es vigente si `activo = true` y la fecha actual está entre `fechaInicio` y `fechaFin`.
-- El descuento se aplica automáticamente al calcular el subtotal del carrito y al confirmar la orden, registrándose el precio con descuento en ORDEN_ITEM.
-- El porcentaje de descuento se aplica sobre el precio base del producto.
-
-## 🏗️ Arquitectura
-
-### Backend
-Arquitectura en capas estándar de Spring Boot:
-
-```
-Controller → Service (interfaz + implementación) → Repository → MySQL
-```
-
-```
-src/
-└── main/
-    └── java/com/uade/tpo/wepadel/
-        ├── controllers/      # Endpoints REST (@RestController)
-        ├── entity/           # Entidades JPA + DTOs de request
-        │   └── dto/
-        ├── service/          # Interfaces de negocio + implementaciones
-        ├── repository/       # Interfaces JpaRepository
-        └── exceptions/       # Excepciones de dominio + GlobalExceptionHandler (@ControllerAdvice)
-```
-
-### Frontend *(a construir)*
-TBC
----
-
-## 🗄️ Base de datos
-
-- **Motor:** MySQL 8
-- **ORM:** Spring Data JPA / Hibernate
-- **DDL:** `spring.jpa.hibernate.ddl-auto=update`
-- **Credenciales:** en `src/main/resources/application.properties`
-
-> ⚠️ Las credenciales están commiteadas temporalmente. Una vez que todos las tengan configuradas localmente, sacarlas del repo y usar variables de entorno.
-
-### Entidades
-- USUARIO
-- SISTEMA_PUNTOS
-- CARRITO
-- CARRITO_ITEM
-- ORDEN
-- ORDEN_ITEM
-- PRODUCTO
-- STOCK
-- IMAGEN *(binario en columna BLOB)*
-- DESCUENTO
-
-Ver DER a continuación: https://drive.google.com/file/d/130RcFVG2nYpXJcGGJ4vr-O_wKtDfw2Tl/view?usp=sharing
+La API queda disponible en `http://localhost:8080`.  
+Las tablas se crean automáticamente (ddl-auto=update).
 
 ---
 
-## 📡 Endpoints
+## Flujo rápido de prueba
 
-### Recurso: Auth
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `POST` | `/api/v1/auth/register` | Registrar usuario y devolver token | — |
-| `POST` | `/api/v1/auth/authenticate` | Autenticar credenciales (Login) y devolver JWT | — |
+1. Registrar usuario → `POST /api/v1/auth/register`
+2. Copiar el `token` de la respuesta
+3. Usarlo en el header: `Authorization: Bearer <token>`
+4. Operar endpoints protegidos normalmente
 
-### Recurso: Usuarios
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/usuarios` | Listar todos los usuarios registrados | ADMINISTRADOR |
-| `GET` | `/usuarios/{usuarioId}` | Obtener usuario por ID | ADMINISTRADOR / CLIENTE |
-| `PUT` | `/usuarios/{usuarioId}` | Actualizar datos del usuario | ADMINISTRADOR / CLIENTE |
+---
 
-### Recurso: Sistema de Puntos
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/usuarios/{usuarioId}/puntos` | Consultar saldo de puntos del usuario | CLIENTE |
+## Arquitectura
 
-### Recurso: Carrito
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/usuarios/{usuarioId}/carrito` | Obtener carrito del usuario | CLIENTE |
-| `GET` | `/usuarios/{usuarioId}/carrito/items` | Listar ítems del carrito | CLIENTE |
-| `POST` | `/usuarios/{usuarioId}/carrito/items` | Agregar producto o incrementar cantidad | CLIENTE |
-| `PUT` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Actualizar cantidad (0 elimina el ítem) | CLIENTE |
-| `DELETE` | `/usuarios/{usuarioId}/carrito/items/{productoId}` | Eliminar producto del carrito | CLIENTE |
-| `DELETE` | `/usuarios/{usuarioId}/carrito` | Vaciar carrito completo | CLIENTE |
+Controller → Service (interfaz + impl) → Repository → MySQL
+Seguridad: Spring Security + JWT. Cada request pasa por `JwtAuthenticationFilter` antes de llegar al controller.
 
-### Recurso: Órdenes
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/usuarios/{usuarioId}/ordenes` | Listar órdenes del usuario | CLIENTE |
-| `GET` | `/usuarios/{usuarioId}/ordenes/{ordenId}` | Obtener detalle de una orden | CLIENTE |
-| `POST` | `/usuarios/{usuarioId}/ordenes` | Confirmar compra, generar orden y descontar stock | CLIENTE |
-| `PUT` | `/usuarios/{usuarioId}/ordenes/{ordenId}/cancelar` | Cancelar orden dentro de las 24 horas | CLIENTE |
+Roles: `CLIENTE` y `ADMINISTRADOR`.
 
-### Recurso: Productos
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/productos` | Listar productos habilitados | — |
-| `GET` | `/productos/{productoId}` | Obtener detalle de producto | — |
-| `POST` | `/productos` | Crear producto | ADMINISTRADOR |
-| `PUT` | `/productos/{productoId}` | Actualizar producto | ADMINISTRADOR |
+---
 
-### Recurso: Imágenes
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/imagenes/{imagenId}` | Obtener una imagen por id | — |
-| `GET` | `/imagenes/producto/{productoId}` | Listar imágenes de un producto | — |
-| `POST` | `/imagenes` | Subir imagen asociada a un producto | ADMINISTRADOR |
+## Colección Postman
 
-### Recurso: Descuentos
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `POST` | `/descuentos` | Crear un descuento para un producto | ADMINISTRADOR |
-| `GET` | `/descuentos/{id}` | Obtener un descuento por id | — |
-| `GET` | `/descuentos/producto/{productoId}` | Obtener todos los descuentos de un producto | — |
-| `DELETE` | `/descuentos/{id}` | Eliminar un descuento | ADMINISTRADOR |
+Disponible en `postman/wepadel.json` dentro del repositorio.
 
-### Recurso: Stocks
-| Método | Endpoint | Descripción | Rol |
-|--------|----------|-------------|-----|
-| `GET` | `/stocks/producto/{productoId}` | Obtener stock de un producto | — |
-| `PUT` | `/stocks/producto/{productoId}` | Actualizar stock de un producto | ADMINISTRADOR |
+---
+
+## Requerimientos y lógica de negocio
+
+1. Los usuarios invitados pueden ver el catálogo de productos (incluyendo imágenes y descuentos vigentes), los registrados además pueden agregar productos al carrito, ver su perfil, historial de compras y saldo de puntos.
+2. El administrador tiene credenciales únicas provistas por el equipo técnico, acceso exclusivo para gestionar catálogo, stock y descuentos, y no puede realizar compras ni poseer carrito.
+3. El registro de usuarios se realiza a través del endpoint /api/v1/auth/register, que devuelve un JWT válido para operar inmediatamente. El login posterior se hace en /api/v1/auth/authenticate.
+4. Al registrar un usuario cliente, se crean automáticamente su carrito y su sistema de puntos.
+5. El carrito del usuario registrado persiste por 7 días, si no se concreta la compra en ese plazo, se vacía automáticamente.
+6. El subtotal del carrito se actualiza en tiempo real según el precio actual del producto, aplicando automáticamente el descuento vigente si existe.
+7. Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
+8. Los puntos se suman al confirmar una orden y se restan si se usan como parte de pago o si la orden se cancela.
+9. La orden se genera únicamente al ejecutar POST /usuarios/{id}/ordenes, si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
+10. Un usuario invitado debe registrarse para poder confirmar una orden.
+11. Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
+12. Al confirmar una compra, se registra el precio unitario del momento (con descuento aplicado si corresponde) en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
+13. Los clientes registrados pueden cancelar una orden dentro de las primeras 24 horas mediante PUT /usuarios/{id}/ordenes/{ordenId}/cancelar. Al cancelar, la orden pasa a estado CANCELADA, el stock se restaura y los puntos generados se eliminan.
+14. Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador (PUT /stocks/producto/{productoId}).
+15. Cada producto puede tener varias imágenes: se almacenan en base de datos como LONGBLOB, se suben por multipart/form-data vía POST /imagenes, y se exponen en las respuestas JSON en Base64 (archivoBase64) para consumo desde el frontend.
+16. Un producto puede tener múltiples descuentos registrados, pero solo uno puede estar vigente a la vez. Un descuento es vigente si activo = true y la fecha actual se encuentra entre fechaInicio y fechaFin.
+17. Las categorías de producto (PALETAS, ACCESORIOS, PELOTAS) son fijas, no pueden ser creadas ni modificadas.
+18. Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos del catálogo sin eliminarlos del sistema.
+19. El sistema valida que el mail tenga formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial.
+20. Todos los endpoints protegidos devuelven 401 Unauthorized si no se provee token, y 403 Forbidden si el rol del usuario no tiene permisos suficientes.
+
+---
+
+## 🤝 Modo de trabajo
+
+- **Avisar en el grupo** en qué tarea vas a trabajar antes de arrancar, para evitar conflictos.
+- **Crear una branch por cada feature o fix**, con nombres descriptivos:
+  ```
+  feature/login-jwt
+  feature/redux-carrito
+  fix/descuento-stock
+  ```
+- **Nunca commitear directo en `main`.**
+- Verificar que el proyecto compila y corre antes de hacer el PR.
+- Una vez mergeada la branch, **eliminarla** para mantener el repo limpio.
 
 ---
 
 ## 🗺️ Roadmap y tareas del proyecto
-
-El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un hito concreto. Anotarse a las tareas que van a realizar.
 
 ### ✅ Entrega #1 — Modelo de datos y entidades `(vence 07/04)`
 - [x] Entidades JPA creadas y mapeadas
@@ -237,24 +157,3 @@ El desarrollo sigue el cronograma de la materia. Cada entrega obligatoria es un 
 - [ ] Integrar middleware si es necesario
 
 ---
-
-## 🐛 Bugs y pendientes
-
-- [ ] Crear UML
-- [ ] Diagrama de arquitectura (capas + Security Filter Chain + persistencia)
-- [ ] Evidencias (capturas): tablas y datos visibles en Workbench; captura de login + JWT; captura de acceso a endpoint protegido con token; captura de endpoint que falla sin token y con rol insuficiente (403/401)
-
----
-
-## 🤝 Modo de trabajo
-
-- **Avisar en el grupo** en qué tarea vas a trabajar antes de arrancar, para evitar conflictos.
-- **Crear una branch por cada feature o fix**, con nombres descriptivos:
-  ```
-  feature/login-jwt
-  feature/redux-carrito
-  fix/descuento-stock
-  ```
-- **Nunca commitear directo en `main`.**
-- Verificar que el proyecto compila y corre antes de hacer el PR.
-- Una vez mergeada la branch, **eliminarla** para mantener el repo limpio.
