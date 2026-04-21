@@ -25,9 +25,18 @@ CREATE DATABASE wepadel;
 
 **3. Configurar credenciales en** `src/main/resources/application.properties`
 ```properties
+spring.application.name=wepadel
 spring.datasource.url=jdbc:mysql://localhost:3306/wepadel
+spring.datasource.driverClassName=com.mysql.jdbc.Driver
 spring.datasource.username=root
-spring.datasource.password=TU_PASSWORD
+spring.datasource.password=${DB_PASSWORD}
+spring.jpa.hibernate.ddl-auto=update
+spring.web.error.include-message=always
+spring.web.error.include-binding-errors=always
+application.security.jwt.secretKey=${JWT_SECRET_KEY}
+application.security.jwt.expiration=${JWT_EXPIRATION}
+spring.servlet.multipart.max-file-size=15MB
+spring.servlet.multipart.max-request-size=15MB
 ```
 
 **4. Levantar el servidor**
