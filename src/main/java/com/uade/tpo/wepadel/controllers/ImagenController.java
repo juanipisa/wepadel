@@ -15,6 +15,8 @@ import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.service.ImagenService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("imagenes")
 public class ImagenController {
@@ -28,7 +30,7 @@ public class ImagenController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createImagen(AddImagenRequest request) {
+    public ResponseEntity<Void> createImagen(@Valid AddImagenRequest request) {
         Long id = imagenService.createImagen(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/imagenes/" + id))
