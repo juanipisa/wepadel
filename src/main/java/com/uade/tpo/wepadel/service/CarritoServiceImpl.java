@@ -56,6 +56,7 @@ public class CarritoServiceImpl implements CarritoService {
     public Carrito getCarritoByUsuarioId(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(carrito.getItems());
         return carrito;
     }
 
@@ -67,7 +68,9 @@ public class CarritoServiceImpl implements CarritoService {
 
     public List<CarritoItem> getItems(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
-        return carrito.getItems();
+        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
+        enriquecerItemsConPrecios(items);
+        return items;
     }
 
     public CarritoItem addItem(Long usuarioId, CarritoItemRequest request) {
@@ -111,6 +114,7 @@ public class CarritoServiceImpl implements CarritoService {
         CarritoItem saved = carritoItemRepository.save(item);
         actualizarModificacion(carrito);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(List.of(saved));
         return saved;
     }
 
@@ -129,6 +133,7 @@ public class CarritoServiceImpl implements CarritoService {
         if (nuevaCantidad == 0) {
             removeItem(usuarioId, productoId);
             item.setCantidad(0);
+            enriquecerItemsConPrecios(List.of(item));
             return item;
         }
 
@@ -143,6 +148,7 @@ public class CarritoServiceImpl implements CarritoService {
         carritoItemRepository.save(item);
         actualizarModificacion(carrito);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(List.of(item));
         return item;
     }
 
@@ -170,6 +176,14 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     // --- Métodos auxiliares privados ---
+
+    private void enriquecerItemsConPrecios(List<CarritoItem> items) {
+        if (items == null) return;
+        for (CarritoItem item : items) {
+            BigDecimal conDescuento = calcularPrecioConDescuento(item.getProducto());
+            item.setPrecioUnitarioConDescuento(conDescuento);
+        }
+    }
 
     private Carrito validarYObtenerCarrito(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
@@ -201,22 +215,26 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void recalcularSubtotal(Carrito carrito) {
-    List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
+        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
 
-    BigDecimal subtotal = items.stream()
-            .map(item -> {
-                BigDecimal precio = item.getProducto().getPrecio();
-                Optional<Descuento> descuento = descuentoService.getDescuentoVigente(item.getProducto().getId());
-                if (descuento.isPresent()) {
-                    BigDecimal porcentaje = descuento.get().getPorcentaje();
-                    BigDecimal factor = BigDecimal.ONE.subtract(porcentaje.divide(BigDecimal.valueOf(100)));
-                    precio = precio.multiply(factor);
-                }
-                return precio.multiply(BigDecimal.valueOf(item.getCantidad()));
-            })
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal subtotal = items.stream()
+                .map(item -> {
+                    return calcularPrecioConDescuento(item.getProducto()).multiply(BigDecimal.valueOf(item.getCantidad()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    carrito.setSubtotal(subtotal);
-    carritoRepository.save(carrito);
-}
+        carrito.setSubtotal(subtotal);
+        carritoRepository.save(carrito);
+    }
+
+    private BigDecimal calcularPrecioConDescuento(Producto producto) {
+        BigDecimal precioOriginal = producto.getPrecio();
+        Optional<Descuento> descuento = descuentoService.getDescuentoVigente(producto.getId());
+        if (descuento.isPresent()) {
+            BigDecimal factor = BigDecimal.ONE.subtract(
+                descuento.get().getPorcentaje().divide(BigDecimal.valueOf(100)));
+            return precioOriginal.multiply(factor);
+        }
+        return precioOriginal;
+    }
 }

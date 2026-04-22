@@ -10,6 +10,8 @@ public interface DescuentoService {
 
     Descuento createDescuento(DescuentoRequest request);
 
+    Optional<Descuento> updateDescuento(Long id, DescuentoRequest request);
+
     List<Descuento> getDescuentosByProductoId(Long productoId);
 
     Descuento getDescuentoById(Long id);
