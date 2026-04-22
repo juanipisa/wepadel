@@ -37,11 +37,6 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "El mail ya está registrado");
     }
 
-    @ExceptionHandler(UsuarioDatosInvalidosException.class)
-    public ResponseEntity<Object> handleUsuarioDatosInvalidos(UsuarioDatosInvalidosException ex) {
-        return buildResponse(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
     @ExceptionHandler(org.springframework.security.authentication.BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentials(org.springframework.security.authentication.BadCredentialsException ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, "Email o contraseña incorrectos");

@@ -97,6 +97,7 @@ Disponible en `postman/wepadel.json` dentro del repositorio.
 18. Los productos pueden desactivarse mediante el flag estaHabilitado para ocultarlos del catálogo sin eliminarlos del sistema.
 19. El sistema valida que el mail tenga formato válido y que la contraseña posea al menos 12 caracteres, incluyendo una mayúscula, un número y un símbolo especial.
 20. Todos los endpoints protegidos devuelven 401 Unauthorized si no se provee token, y 403 Forbidden si el rol del usuario no tiene permisos suficientes.
+21. Seguridad en perfiles: Un usuario con rol CLIENTE solo puede editar su propia información. Un ADMINISTRADOR puede editar perfiles de clientes (incluyendo mail y password), pero tiene prohibido editar la información de otros administradores.
 
 ---
 

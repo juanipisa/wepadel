@@ -3,21 +3,20 @@ package com.uade.tpo.wepadel.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.uade.tpo.wepadel.entity.RolEnum;
 import com.uade.tpo.wepadel.entity.Usuario;
 import com.uade.tpo.wepadel.entity.dto.UsuarioRequest;
-import com.uade.tpo.wepadel.exceptions.UsuarioDatosInvalidosException;
+import com.uade.tpo.wepadel.exceptions.AccesoDenegadoException;
 import com.uade.tpo.wepadel.exceptions.UsuarioDuplicateException;
 import com.uade.tpo.wepadel.exceptions.UsuarioNotFoundException;
 import com.uade.tpo.wepadel.repository.UsuarioRepository;
 
 @Service
 public class UsuarioServiceImpl implements UsuarioService {
-
-    private static final String REGEX_EMAIL = "^[A-Za-z0-9+_.-]+@(.+)$";
-    private static final String REGEX_PASSWORD = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!]).{12,}$";
 
     @Autowired
     private UsuarioRepository usuarioRepository;
@@ -35,34 +34,36 @@ public class UsuarioServiceImpl implements UsuarioService {
     }
 
     public Usuario updateUsuario(Long usuarioId, UsuarioRequest request) {
-        validarActualizacion(usuarioId, request);
+        String mailActual = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario activo = usuarioRepository.findByMail(mailActual)
+                .orElseThrow(UsuarioNotFoundException::new);
+
         Usuario usuario = usuarioRepository.findById(usuarioId)
-                .orElseThrow(() -> new UsuarioNotFoundException());
+                .orElseThrow(UsuarioNotFoundException::new);
+
+        // Caso 1: CLIENTE intentando editar a otro
+        if (activo.getRol() == RolEnum.CLIENTE && !activo.getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException("Un cliente solo puede editar su propio perfil");
+        }
+
+        // Caso 2: ADMINISTRADOR intentando editar a otro ADMINISTRADOR (que no sea él mismo)
+        if (activo.getRol() == RolEnum.ADMINISTRADOR && 
+            usuario.getRol() == RolEnum.ADMINISTRADOR && 
+            !activo.getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException("Un administrador no puede editar a otro administrador");
+        }
+
         if (request.getNombreApellido() != null) {
             usuario.setNombreApellido(request.getNombreApellido());
         }
         if (request.getMail() != null) {
+            validarMailDuplicado(request.getMail(), usuarioId);
             usuario.setMail(request.getMail());
         }
         if (request.getPassword() != null) {
             usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         }
-        if (request.getRol() != null) {
-            usuario.setRol(request.getRol());
-        }
         return usuarioRepository.save(usuario);
-    }
-
-    private void validarActualizacion(Long usuarioId, UsuarioRequest request) {
-        String mail = request.getMail();
-        String password = request.getPassword();
-        if (mail != null) {
-            validarMailDuplicado(mail, usuarioId);
-            validarFormatoMail(mail);
-        }
-        if (password != null) {
-            validarFormatoPassword(password);
-        }
     }
 
     private void validarMailDuplicado(String email, Long excluirUsuarioId) {
@@ -70,18 +71,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .filter(u -> !u.getId().equals(excluirUsuarioId))
                 .isPresent()) {
             throw new UsuarioDuplicateException("El email ya se encuentra registrado");
-        }
-    }
-    private void validarFormatoMail(String email) {
-        if (!email.matches(REGEX_EMAIL)) {
-            throw new UsuarioDatosInvalidosException("El formato del mail no es válido");
-        }
-    }
-
-    private void validarFormatoPassword(String password) {
-        if (!password.matches(REGEX_PASSWORD)) {
-            throw new UsuarioDatosInvalidosException(
-                    "La contraseña debe tener al menos 12 caracteres, incluir una mayúscula, un número y un símbolo");
         }
     }
 }
