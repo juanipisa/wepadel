@@ -5,11 +5,12 @@ import java.util.List;
 import com.uade.tpo.wepadel.entity.Carrito;
 import com.uade.tpo.wepadel.entity.CarritoItem;
 import com.uade.tpo.wepadel.entity.dto.CarritoItemRequest;
+import com.uade.tpo.wepadel.entity.dto.CarritoItemResponse;
 
 public interface CarritoService {
     public Carrito getCarritoByUsuarioId(Long usuarioId);
     public Carrito createCarrito(Long usuarioId);
-    public List<CarritoItem> getItems(Long usuarioId);
+    public List<CarritoItemResponse> getItems(Long usuarioId);
     public CarritoItem addItem(Long usuarioId, CarritoItemRequest request);
     public CarritoItem updateCantidad(Long usuarioId, Long productoId, int nuevaCantidad);
     public void removeItem(Long usuarioId, Long productoId);

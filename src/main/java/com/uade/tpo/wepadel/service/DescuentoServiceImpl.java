@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.uade.tpo.wepadel.entity.Descuento;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.DescuentoRequest;
+import com.uade.tpo.wepadel.exceptions.DescuentoInvalidoException;
 import com.uade.tpo.wepadel.exceptions.DescuentoNotFoundException;
+import com.uade.tpo.wepadel.exceptions.DescuentoSuperpuestoException;
 import com.uade.tpo.wepadel.exceptions.ProductoNotFoundException;
 import com.uade.tpo.wepadel.repository.DescuentoRepository;
 import com.uade.tpo.wepadel.repository.ProductoRepository;
@@ -29,6 +31,8 @@ public class DescuentoServiceImpl implements DescuentoService {
         Producto producto = productoRepository.findById(request.getProductoId())
                 .orElseThrow(ProductoNotFoundException::new);
 
+        validarSuperposicion(request.getProductoId(), request.getFechaInicio(), request.getFechaFin(), null);
+
         Descuento descuento = new Descuento(
                 producto,
                 request.getPorcentaje(),
@@ -36,7 +40,35 @@ public class DescuentoServiceImpl implements DescuentoService {
                 request.getFechaFin()
         );
 
+        if (request.getActivo() != null) {
+            descuento.setActivo(request.getActivo());
+        }
+
         return descuentoRepository.save(descuento);
+    }
+
+    @Override
+    public Optional<Descuento> updateDescuento(Long id, DescuentoRequest request) {
+        Descuento descuento = descuentoRepository.findById(id)
+                .orElseThrow(DescuentoNotFoundException::new);
+
+        if (request.getPorcentaje() != null) {
+            descuento.setPorcentaje(request.getPorcentaje());
+        }
+
+        LocalDateTime nuevoInicio = request.getFechaInicio() != null ? request.getFechaInicio() : descuento.getFechaInicio();
+        LocalDateTime nuevoFin = request.getFechaFin() != null ? request.getFechaFin() : descuento.getFechaFin();
+        boolean nuevoActivo = request.getActivo() != null ? request.getActivo() : descuento.getActivo();
+
+        if (nuevoActivo) {
+            validarSuperposicion(descuento.getProducto().getId(), nuevoInicio, nuevoFin, descuento.getId());
+        }
+
+        if (request.getFechaInicio() != null) descuento.setFechaInicio(request.getFechaInicio());
+        if (request.getFechaFin() != null) descuento.setFechaFin(request.getFechaFin());
+        if (request.getActivo() != null) descuento.setActivo(request.getActivo());
+
+        return Optional.of(descuentoRepository.save(descuento));
     }
 
     @Override
@@ -64,5 +96,14 @@ public class DescuentoServiceImpl implements DescuentoService {
                         && !ahora.isBefore(d.getFechaInicio())
                         && !ahora.isAfter(d.getFechaFin()))
                 .findFirst();
+    }
+
+    private void validarSuperposicion(Long productoId, LocalDateTime inicio, LocalDateTime fin, Long descuentoIdIgnorar) {
+        if (inicio.isAfter(fin)) throw new DescuentoInvalidoException();
+        descuentoRepository.findByProductoId(productoId).stream()
+                .filter(Descuento::getActivo)
+                .filter(d -> descuentoIdIgnorar == null || !d.getId().equals(descuentoIdIgnorar))
+                .anyMatch(d -> !(fin.isBefore(d.getFechaInicio()) || inicio.isAfter(d.getFechaFin())))
+                .orElseThrow(DescuentoSuperpuestoException::new);
     }
 }

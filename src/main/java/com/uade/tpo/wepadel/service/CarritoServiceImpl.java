@@ -65,9 +65,12 @@ public class CarritoServiceImpl implements CarritoService {
         return carritoRepository.save(new Carrito(usuario));
     }
 
-    public List<CarritoItem> getItems(Long usuarioId) {
+    public List<CarritoItemResponse> getItems(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
-        return carrito.getItems();
+        return carritoItemRepository.findByCarrito(carrito)
+                .stream()
+                .map(this::toResponse)
+                .toList();
     }
 
     public CarritoItem addItem(Long usuarioId, CarritoItemRequest request) {
@@ -171,6 +174,15 @@ public class CarritoServiceImpl implements CarritoService {
 
     // --- Métodos auxiliares privados ---
 
+    private CarritoItemResponse toResponse(CarritoItem item) {
+        return CarritoItemResponse.builder()
+                .id(item.getId())
+                .producto(item.getProducto())
+                .cantidad(item.getCantidad())
+                .precioConDescuento(calcularPrecioConDescuento(item.getProducto()))
+                .build();
+    }
+    
     private Carrito validarYObtenerCarrito(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(UsuarioNotFoundException::new);
@@ -201,22 +213,26 @@ public class CarritoServiceImpl implements CarritoService {
     }
 
     private void recalcularSubtotal(Carrito carrito) {
-    List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
+        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
 
-    BigDecimal subtotal = items.stream()
-            .map(item -> {
-                BigDecimal precio = item.getProducto().getPrecio();
-                Optional<Descuento> descuento = descuentoService.getDescuentoVigente(item.getProducto().getId());
-                if (descuento.isPresent()) {
-                    BigDecimal porcentaje = descuento.get().getPorcentaje();
-                    BigDecimal factor = BigDecimal.ONE.subtract(porcentaje.divide(BigDecimal.valueOf(100)));
-                    precio = precio.multiply(factor);
-                }
-                return precio.multiply(BigDecimal.valueOf(item.getCantidad()));
-            })
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal subtotal = items.stream()
+                .map(item -> {
+                    return calcularPrecioConDescuento(item).multiply(BigDecimal.valueOf(item.getCantidad()));
+                })
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-    carrito.setSubtotal(subtotal);
-    carritoRepository.save(carrito);
-}
+        carrito.setSubtotal(subtotal);
+        carritoRepository.save(carrito);
+    }
+
+    private BigDecimal calcularPrecioConDescuento(CarritoItem item) {
+        BigDecimal precioOriginal = producto.getPrecio();
+        Optional<Descuento> descuento = descuentoService.getDescuentoVigente(producto.getId());
+        if (descuento.isPresent()) {
+            BigDecimal factor = BigDecimal.ONE.subtract(
+                descuento.get().getPorcentaje().divide(BigDecimal.valueOf(100)));
+            return precioOriginal.multiply(factor);
+        }
+        return precioOriginal;
+    }
 }

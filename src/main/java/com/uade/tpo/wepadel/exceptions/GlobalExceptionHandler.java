@@ -153,6 +153,16 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, "Descuento no encontrado");
     }
 
+    @ExceptionHandler(DescuentoInvalidoException.class)
+    public ResponseEntity<Object> handleDescuentoInvalido(DescuentoInvalidoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "La fecha de inicio no puede ser posterior a la fecha de fin.");
+    }
+
+    @ExceptionHandler(DescuentoSuperpuestoException.class)
+    public ResponseEntity<Object> handleDescuentoSuperpuesto(DescuentoSuperpuestoException ex) {
+        return buildResponse(HttpStatus.BAD_REQUEST, "El producto ya tiene un descuento activo en ese rango de fechas.");
+    }
+
     // SISTEMA DE PUNTOS
     
     @ExceptionHandler(SistemaPuntosNotFoundException.class)

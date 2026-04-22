@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.Carrito;
 import com.uade.tpo.wepadel.entity.CarritoItem;
+import com.uade.tpo.wepadel.entity.dto.CarritoItemResponse;
 import com.uade.tpo.wepadel.entity.dto.CarritoItemRequest;
 import com.uade.tpo.wepadel.service.CarritoService;
 
@@ -31,7 +32,7 @@ public class CarritoController {
     }
 
     @GetMapping("/items")
-    public ResponseEntity<List<CarritoItem>> getItems(@PathVariable Long usuarioId) {
+    public ResponseEntity<List<CarritoItemResponse>> getItems(@PathVariable Long usuarioId) {
         return ResponseEntity.ok(carritoService.getItems(usuarioId));
     }
 

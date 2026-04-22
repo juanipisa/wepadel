@@ -20,4 +20,5 @@ public class DescuentoRequest {
     private LocalDateTime fechaInicio;
     @NotNull
     private LocalDateTime fechaFin;
+    private Boolean activo;
 }
