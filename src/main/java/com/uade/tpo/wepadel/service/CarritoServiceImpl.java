@@ -182,7 +182,7 @@ public class CarritoServiceImpl implements CarritoService {
                 .precioConDescuento(calcularPrecioConDescuento(item.getProducto()))
                 .build();
     }
-    
+
     private Carrito validarYObtenerCarrito(Long usuarioId) {
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(UsuarioNotFoundException::new);
@@ -217,7 +217,7 @@ public class CarritoServiceImpl implements CarritoService {
 
         BigDecimal subtotal = items.stream()
                 .map(item -> {
-                    return calcularPrecioConDescuento(item).multiply(BigDecimal.valueOf(item.getCantidad()));
+                    return calcularPrecioConDescuento(item.getProducto()).multiply(BigDecimal.valueOf(item.getCantidad()));
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -225,7 +225,7 @@ public class CarritoServiceImpl implements CarritoService {
         carritoRepository.save(carrito);
     }
 
-    private BigDecimal calcularPrecioConDescuento(CarritoItem item) {
+    private BigDecimal calcularPrecioConDescuento(Producto producto) {
         BigDecimal precioOriginal = producto.getPrecio();
         Optional<Descuento> descuento = descuentoService.getDescuentoVigente(producto.getId());
         if (descuento.isPresent()) {
