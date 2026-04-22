@@ -1,6 +1,6 @@
 {
   "info": {
-    "name": "WePadel API - Happy Path",
+    "name": "WePadel API",
     "description": "Colección de camino feliz para probar todos los endpoints de WePadel. Seguir el orden de las carpetas para que los IDs se propaguen correctamente.",
     "_postman_id": "wepadel-happy-path",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
