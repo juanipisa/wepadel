@@ -84,12 +84,12 @@ Disponible en `postman/wepadel.json` dentro del repositorio.
 5. El carrito del usuario registrado persiste por 7 días, si no se concreta la compra en ese plazo, se vacía automáticamente.
 6. El subtotal del carrito se actualiza en tiempo real según el precio actual del producto, aplicando automáticamente el descuento vigente si existe.
 7. Al agregar un producto que ya está en el carrito, se incrementa la cantidad en el ítem existente en lugar de crear uno nuevo.
-8. Los puntos se suman al confirmar una orden y se restan si se usan como parte de pago o si la orden se cancela.
+8. Los puntos se suman al confirmar una orden. Si se usan como parte de pago se restan del saldo; al cancelar una orden se revierte el impacto de puntos. El CLIENTE no podrá usar puntos si su saldo es negativo.
 9. La orden se genera únicamente al ejecutar POST /usuarios/{id}/ordenes, si el proceso se interrumpe antes, la orden no se crea y el carrito permanece intacto.
 10. Un usuario invitado debe registrarse para poder confirmar una orden.
 11. Una vez confirmada la orden, el carrito se vacía inmediatamente, incluso si la compra se cancela posteriormente.
 12. Al confirmar una compra, se registra el precio unitario del momento (con descuento aplicado si corresponde) en ORDEN_ITEM para que el historial sea inalterable ante futuros cambios de precio.
-13. Los clientes registrados pueden cancelar una orden dentro de las primeras 24 horas mediante PUT /usuarios/{id}/ordenes/{ordenId}/cancelar. Al cancelar, la orden pasa a estado CANCELADA, el stock se restaura y los puntos generados se eliminan.
+13. Los clientes registrados pueden cancelar una orden dentro de las primeras 24 horas mediante PUT /usuarios/{id}/ordenes/{ordenId}/cancelar. Al cancelar, la orden pasa a estado CANCELADA, el stock se restaura y se revierte el impacto de puntos: se restan los puntos generados y se reembolsan los puntos usados. El saldo puede quedar negativo; si queda negativo, el usuario no podrá canjear puntos hasta volver a balance comprando.
 14. Cada producto tiene un stock asociado que se descuenta al confirmar la orden y se actualiza manualmente por el administrador (PUT /stocks/producto/{productoId}).
 15. Cada producto puede tener varias imágenes: se almacenan en base de datos como LONGBLOB, se suben por multipart/form-data vía POST /imagenes, y se exponen en las respuestas JSON en Base64 (archivoBase64) para consumo desde el frontend.
 16. Un producto puede tener múltiples descuentos registrados, pero solo uno puede estar vigente a la vez. Un descuento es vigente si activo = true y la fecha actual se encuentra entre fechaInicio y fechaFin.

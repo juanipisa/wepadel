@@ -42,7 +42,4 @@ public class Producto {
     @Column(name = "estaHabilitado", nullable = false)
     private Boolean estaHabilitado = true;
 
-    @jakarta.persistence.Transient
-    private BigDecimal precioConDescuento;
-
 }

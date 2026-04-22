@@ -146,7 +146,7 @@ public class OrdenServiceImpl implements OrdenService {
     
         Long uid = orden.getUsuario().getId();
         if (orden.getPuntosGenerados() > 0) {
-            sistemaPuntosService.restarPuntos(uid, orden.getPuntosGenerados());
+            sistemaPuntosService.ajustarPuntos(uid, orden.getPuntosGenerados());
         }
         if (orden.getPuntosUsados() > 0) {
             sistemaPuntosService.sumarPuntos(uid, orden.getPuntosUsados());

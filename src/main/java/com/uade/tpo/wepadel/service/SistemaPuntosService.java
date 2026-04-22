@@ -22,6 +22,8 @@ public interface SistemaPuntosService {
 
     public Optional<SistemaPuntos> restarPuntos(Long usuarioId, int puntosARestar);
     //le saca puntos al usuario cuando los usa
+
+    public Optional<SistemaPuntos> ajustarPuntos(Long usuarioId, int puntosARestar);
 }
 
 

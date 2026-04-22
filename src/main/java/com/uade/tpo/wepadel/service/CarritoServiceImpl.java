@@ -56,6 +56,7 @@ public class CarritoServiceImpl implements CarritoService {
     public Carrito getCarritoByUsuarioId(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(carrito.getItems());
         return carrito;
     }
 
@@ -65,12 +66,11 @@ public class CarritoServiceImpl implements CarritoService {
         return carritoRepository.save(new Carrito(usuario));
     }
 
-    public List<CarritoItemResponse> getItems(Long usuarioId) {
+    public List<CarritoItem> getItems(Long usuarioId) {
         Carrito carrito = validarYObtenerCarrito(usuarioId);
-        return carritoItemRepository.findByCarrito(carrito)
-                .stream()
-                .map(this::toResponse)
-                .toList();
+        List<CarritoItem> items = carritoItemRepository.findByCarrito(carrito);
+        enriquecerItemsConPrecios(items);
+        return items;
     }
 
     public CarritoItem addItem(Long usuarioId, CarritoItemRequest request) {
@@ -114,6 +114,7 @@ public class CarritoServiceImpl implements CarritoService {
         CarritoItem saved = carritoItemRepository.save(item);
         actualizarModificacion(carrito);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(List.of(saved));
         return saved;
     }
 
@@ -132,6 +133,7 @@ public class CarritoServiceImpl implements CarritoService {
         if (nuevaCantidad == 0) {
             removeItem(usuarioId, productoId);
             item.setCantidad(0);
+            enriquecerItemsConPrecios(List.of(item));
             return item;
         }
 
@@ -146,6 +148,7 @@ public class CarritoServiceImpl implements CarritoService {
         carritoItemRepository.save(item);
         actualizarModificacion(carrito);
         recalcularSubtotal(carrito);
+        enriquecerItemsConPrecios(List.of(item));
         return item;
     }
 
@@ -174,13 +177,12 @@ public class CarritoServiceImpl implements CarritoService {
 
     // --- Métodos auxiliares privados ---
 
-    private CarritoItemResponse toResponse(CarritoItem item) {
-        return CarritoItemResponse.builder()
-                .id(item.getId())
-                .producto(item.getProducto())
-                .cantidad(item.getCantidad())
-                .precioConDescuento(calcularPrecioConDescuento(item.getProducto()))
-                .build();
+    private void enriquecerItemsConPrecios(List<CarritoItem> items) {
+        if (items == null) return;
+        for (CarritoItem item : items) {
+            BigDecimal conDescuento = calcularPrecioConDescuento(item.getProducto());
+            item.setPrecioUnitarioConDescuento(conDescuento);
+        }
     }
 
     private Carrito validarYObtenerCarrito(Long usuarioId) {

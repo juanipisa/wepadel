@@ -69,4 +69,13 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
         });
     }
 
+    public Optional<SistemaPuntos> ajustarPuntos(Long usuarioId, int puntosARestar) {
+        if (puntosARestar < 0)
+            throw new PuntosNegativosException();
+        return sistemaPuntosRepository.findByUsuarioId(usuarioId).map(sistema -> {
+            sistema.setCantidad(sistema.getCantidad() - puntosARestar);
+            return sistemaPuntosRepository.save(sistema);
+        });
+    }
+
 }

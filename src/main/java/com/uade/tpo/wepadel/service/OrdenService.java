@@ -11,10 +11,4 @@ public interface OrdenService {
     public List<Orden> getOrdenesByUsuarioId(Long usuarioId);
     public Orden createOrden(OrdenRequest request);
     public Optional<Orden> cancelarOrden(Long ordenId);
-    //TODO: Cuál es la fórmula exacta para calcular puntos_generados?
-    //TODO: Quién crea los OrdenItem? En qué momento?
-    //TODO: Qué validaciones se hacen antes de confirmar la orden?
-    //TODO: Se actualiza stock al crear orden?
-    //TODO: Se suma puntos al usuario al confirmar orden?
-    //TODO: Cuáles son las excepciones que puede lanzar?
 }

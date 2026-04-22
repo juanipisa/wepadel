@@ -100,10 +100,12 @@ public class DescuentoServiceImpl implements DescuentoService {
 
     private void validarSuperposicion(Long productoId, LocalDateTime inicio, LocalDateTime fin, Long descuentoIdIgnorar) {
         if (inicio.isAfter(fin)) throw new DescuentoInvalidoException();
-        descuentoRepository.findByProductoId(productoId).stream()
+        boolean haySuperposicion = descuentoRepository.findByProductoId(productoId).stream()
                 .filter(Descuento::getActivo)
                 .filter(d -> descuentoIdIgnorar == null || !d.getId().equals(descuentoIdIgnorar))
-                .anyMatch(d -> !(fin.isBefore(d.getFechaInicio()) || inicio.isAfter(d.getFechaFin())))
-                .orElseThrow(DescuentoSuperpuestoException::new);
+                .anyMatch(d -> !(fin.isBefore(d.getFechaInicio()) || inicio.isAfter(d.getFechaFin())));
+        if (haySuperposicion) {
+            throw new DescuentoSuperpuestoException();
+        }
     }
 }
