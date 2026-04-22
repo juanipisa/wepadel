@@ -38,17 +38,25 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario activo = usuarioRepository.findByMail(mailActual)
                 .orElseThrow(UsuarioNotFoundException::new);
 
-        if (activo.getRol() == RolEnum.CLIENTE && !activo.getId().equals(usuarioId)) {
-            throw new AccesoDenegadoException();
-        }
-
         Usuario usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(UsuarioNotFoundException::new);
+
+        // Caso 1: CLIENTE intentando editar a otro
+        if (activo.getRol() == RolEnum.CLIENTE && !activo.getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException("Un cliente solo puede editar su propio perfil");
+        }
+
+        // Caso 2: ADMINISTRADOR intentando editar a otro ADMINISTRADOR (que no sea él mismo)
+        if (activo.getRol() == RolEnum.ADMINISTRADOR && 
+            usuario.getRol() == RolEnum.ADMINISTRADOR && 
+            !activo.getId().equals(usuarioId)) {
+            throw new AccesoDenegadoException("Un administrador no puede editar a otro administrador");
+        }
 
         if (request.getNombreApellido() != null) {
             usuario.setNombreApellido(request.getNombreApellido());
         }
-        if (request.getMail() != null && activo.getRol() != RolEnum.ADMINISTRADOR) {
+        if (request.getMail() != null) {
             validarMailDuplicado(request.getMail(), usuarioId);
             usuario.setMail(request.getMail());
         }
