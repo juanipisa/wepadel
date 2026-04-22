@@ -1,0 +1,573 @@
+{
+  "info": {
+    "name": "WePadel API - Happy Path",
+    "description": "Colección de camino feliz para probar todos los endpoints de WePadel. Seguir el orden de las carpetas para que los IDs se propaguen correctamente.",
+    "_postman_id": "wepadel-happy-path",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "base_url", "value": "http://localhost:8080", "type": "string" },
+    { "key": "token_admin", "value": "", "type": "string", "description": "Completar después de login ADMIN" },
+    { "key": "token_cliente", "value": "", "type": "string", "description": "Completar después de login CLIENTE" },
+    { "key": "usuario_id", "value": "", "type": "string", "description": "ID del usuario CLIENTE registrado" },
+    { "key": "producto_id_1", "value": "", "type": "string", "description": "ID del primer producto creado" },
+    { "key": "producto_id_2", "value": "", "type": "string", "description": "ID del segundo producto creado" },
+    { "key": "descuento_id", "value": "", "type": "string", "description": "ID del descuento creado" },
+    { "key": "imagen_id", "value": "", "type": "string", "description": "ID de la imagen subida" },
+    { "key": "orden_id", "value": "", "type": "string", "description": "ID de la orden creada" }
+  ],
+  "item": [
+    {
+      "name": "1️⃣ Auth",
+      "description": "Registrar usuarios y obtener tokens. Copiar accessToken a token_admin y token_cliente según corresponda.",
+      "item": [
+        {
+          "name": "Register ADMIN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreApellido\": \"Admin WePadel\",\n  \"email\": \"admin@wepadel.com\",\n  \"password\": \"Admin1234!\",\n  \"role\": \"ADMINISTRADOR\"\n}"
+            },
+            "description": "Registrar el usuario administrador. Copiar el accessToken a la variable token_admin."
+          }
+        },
+        {
+          "name": "Login ADMIN",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/authenticate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@wepadel.com\",\n  \"password\": \"Admin1234!\"\n}"
+            },
+            "description": "Login del administrador. Copiar el accessToken a la variable token_admin."
+          }
+        },
+        {
+          "name": "Register CLIENTE",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/register",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreApellido\": \"Juan Perez\",\n  \"email\": \"juan@wepadel.com\",\n  \"password\": \"Password123!\",\n  \"role\": \"CLIENTE\"\n}"
+            },
+            "description": "Registrar el usuario cliente. Copiar el id a usuario_id y el accessToken a token_cliente."
+          }
+        },
+        {
+          "name": "Login CLIENTE",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/api/v1/auth/authenticate",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@wepadel.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "description": "Login del cliente. Copiar el accessToken a la variable token_cliente."
+          }
+        }
+      ]
+    },
+    {
+      "name": "2️⃣ Usuarios",
+      "description": "Gestión de usuarios. Requiere token_admin para listar y token_cliente para ver/editar el propio.",
+      "item": [
+        {
+          "name": "Listar usuarios (ADMIN)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "description": "Lista todos los usuarios. Solo accesible para ADMINISTRADOR."
+          }
+        },
+        {
+          "name": "Obtener usuario por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Obtener el perfil del usuario logueado."
+          }
+        },
+        {
+          "name": "Actualizar usuario",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"nombreApellido\": \"Juan Perez Actualizado\"\n}"
+            },
+            "description": "Actualizar nombre del usuario. Se pueden pasar solo los campos a modificar."
+          }
+        }
+      ]
+    },
+    {
+      "name": "3️⃣ Productos",
+      "description": "Gestión de productos. Lectura pública, escritura solo ADMIN.",
+      "item": [
+        {
+          "name": "Crear producto 1 - Paleta (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/productos",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Paleta Babolat Viper Carbon\",\n  \"precio\": 85000,\n  \"estaHabilitado\": true,\n  \"categoria\": \"PALETAS\"\n}"
+            },
+            "description": "Crear primer producto. Copiar el id a producto_id_1."
+          }
+        },
+        {
+          "name": "Crear producto 2 - Pelota (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/productos",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"descripcion\": \"Pelotas Head Pro S3\",\n  \"precio\": 9999,\n  \"estaHabilitado\": true,\n  \"categoria\": \"PELOTAS\"\n}"
+            },
+            "description": "Crear segundo producto. Copiar el id a producto_id_2."
+          }
+        },
+        {
+          "name": "Listar productos (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/productos",
+            "description": "Listar todos los productos habilitados. Endpoint público."
+          }
+        },
+        {
+          "name": "Obtener producto por ID (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/productos/{{producto_id_1}}",
+            "description": "Obtener detalle de un producto. Endpoint público."
+          }
+        },
+        {
+          "name": "Actualizar producto (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/productos/{{producto_id_1}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"precio\": 90000\n}"
+            },
+            "description": "Actualizar precio del producto. Solo campos a modificar."
+          }
+        }
+      ]
+    },
+    {
+      "name": "4️⃣ Stocks",
+      "description": "Gestión de stock. Lectura pública, actualización solo ADMIN.",
+      "item": [
+        {
+          "name": "Actualizar stock producto 1 (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_1}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 20\n}"
+            },
+            "description": "Cargar stock del producto 1."
+          }
+        },
+        {
+          "name": "Actualizar stock producto 2 (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_2}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 50\n}"
+            },
+            "description": "Cargar stock del producto 2."
+          }
+        },
+        {
+          "name": "Obtener stock de producto (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_1}}",
+            "description": "Consultar stock actual del producto."
+          }
+        }
+      ]
+    },
+    {
+      "name": "5️⃣ Imágenes",
+      "description": "Gestión de imágenes de productos. Subida solo ADMIN, lectura pública.",
+      "item": [
+        {
+          "name": "Subir imagen al producto 1 (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/imagenes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "archivo", "type": "file", "src": "", "description": "Seleccionar imagen JPG/PNG/WEBP" },
+                { "key": "productoId", "value": "{{producto_id_1}}", "type": "text" }
+              ]
+            },
+            "description": "Subir imagen asociada al producto 1. Copiar el id de la respuesta a imagen_id."
+          }
+        },
+        {
+          "name": "Listar imágenes del producto (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/productos/{{producto_id_1}}/imagenes",
+            "description": "Listar todas las imágenes de un producto en Base64."
+          }
+        },
+        {
+          "name": "Obtener imagen por ID (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/imagenes/{{imagen_id}}",
+            "description": "Obtener imagen individual en Base64."
+          }
+        }
+      ]
+    },
+    {
+      "name": "6️⃣ Descuentos",
+      "description": "Gestión de descuentos. Lectura pública, gestión solo ADMIN.",
+      "item": [
+        {
+          "name": "Crear descuento para producto 1 (ADMIN)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/descuentos",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{producto_id_1}},\n  \"porcentaje\": 20,\n  \"fechaInicio\": \"2026-01-01T00:00:00\",\n  \"fechaFin\": \"2026-12-31T23:59:59\",\n  \"activo\": true\n}"
+            },
+            "description": "Crear descuento del 20% para el producto 1. Copiar el id a descuento_id."
+          }
+        },
+        {
+          "name": "Obtener descuento por ID (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/descuentos/{{descuento_id}}",
+            "description": "Obtener detalle de un descuento."
+          }
+        },
+        {
+          "name": "Descuentos de un producto (público)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/descuentos/producto/{{producto_id_1}}",
+            "description": "Listar todos los descuentos del producto."
+          }
+        },
+        {
+          "name": "Actualizar descuento (ADMIN)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/descuentos/{{descuento_id}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_admin}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"porcentaje\": 15,\n  \"fechaInicio\": \"2026-01-01T00:00:00\",\n  \"fechaFin\": \"2026-12-31T23:59:59\",\n  \"activo\": true\n}"
+            },
+            "description": "Actualizar porcentaje del descuento a 15%."
+          }
+        },
+        {
+          "name": "Eliminar descuento (ADMIN)",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/descuentos/{{descuento_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_admin}}" }],
+            "description": "Eliminar el descuento. Ejecutar al final del flujo de descuentos."
+          }
+        }
+      ]
+    },
+    {
+      "name": "7️⃣ Carrito",
+      "description": "Gestión del carrito del cliente. Todos los endpoints requieren token_cliente.",
+      "item": [
+        {
+          "name": "Obtener carrito",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver el carrito con subtotal actualizado."
+          }
+        },
+        {
+          "name": "Agregar producto 1 al carrito (cantidad 2)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{producto_id_1}},\n  \"cantidad\": 2\n}"
+            },
+            "description": "Agregar 2 unidades del producto 1."
+          }
+        },
+        {
+          "name": "Agregar mismo producto 1 (incrementa a 3 en total)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{producto_id_1}},\n  \"cantidad\": 1\n}"
+            },
+            "description": "Agregar 1 más del producto 1. Debería incrementar el ítem existente a 3."
+          }
+        },
+        {
+          "name": "Agregar producto 2 al carrito",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{producto_id_2}},\n  \"cantidad\": 2\n}"
+            },
+            "description": "Agregar producto 2 al carrito."
+          }
+        },
+        {
+          "name": "Listar ítems del carrito (con precioConDescuento)",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver ítems con precioConDescuento calculado. El producto 1 debería mostrar precio con 15% off."
+          }
+        },
+        {
+          "name": "Actualizar cantidad del producto 1 a 1",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items/{{producto_id_1}}",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cantidad\": 1\n}"
+            },
+            "description": "Actualizar cantidad del producto 1 a 1 unidad."
+          }
+        },
+        {
+          "name": "Ver carrito con subtotal actualizado",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver subtotal con descuento aplicado."
+          }
+        },
+        {
+          "name": "Eliminar producto 2 del carrito",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items/{{producto_id_2}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Eliminar producto 2 del carrito."
+          }
+        },
+        {
+          "name": "Agregar producto 2 nuevamente (para la orden)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito/items",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productoId\": {{producto_id_2}},\n  \"cantidad\": 1\n}"
+            },
+            "description": "Re-agregar producto 2 para tener carrito listo para la orden."
+          }
+        }
+      ]
+    },
+    {
+      "name": "8️⃣ Puntos",
+      "description": "Sistema de puntos del cliente.",
+      "item": [
+        {
+          "name": "Ver puntos antes de la orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/puntos",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver saldo de puntos antes de confirmar la compra (debería ser 0)."
+          }
+        }
+      ]
+    },
+    {
+      "name": "9️⃣ Órdenes",
+      "description": "Flujo completo de órdenes. Ver stock y puntos antes y después para validar.",
+      "item": [
+        {
+          "name": "Ver stock antes de la orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_1}}",
+            "description": "Verificar stock actual antes de confirmar la orden."
+          }
+        },
+        {
+          "name": "Confirmar orden (sin puntos)",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/ordenes",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{token_cliente}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usuario\": {{usuario_id}},\n  \"direccion\": \"Av. Santa Fe 3500\",\n  \"cp\": \"1425\",\n  \"montoEnvio\": 3000,\n  \"usaPuntos\": false,\n  \"puntosUsados\": 0\n}"
+            },
+            "description": "Confirmar compra. Copiar el id de la orden a orden_id. El carrito se vacía automáticamente."
+          }
+        },
+        {
+          "name": "Ver carrito vacío post-orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/carrito",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Verificar que el carrito quedó vacío tras confirmar la orden."
+          }
+        },
+        {
+          "name": "Ver stock descontado post-orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_1}}",
+            "description": "Verificar que el stock se descontó correctamente."
+          }
+        },
+        {
+          "name": "Ver puntos generados post-orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/puntos",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Verificar que se generaron puntos por la compra."
+          }
+        },
+        {
+          "name": "Listar órdenes del usuario",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/ordenes",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver historial de órdenes del cliente."
+          }
+        },
+        {
+          "name": "Obtener detalle de la orden",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/ordenes/{{orden_id}}",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Ver detalle completo de la orden con precioUnitario con descuento aplicado."
+          }
+        },
+        {
+          "name": "Cancelar orden (dentro de 24hs)",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/ordenes/{{orden_id}}/cancelar",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Cancelar la orden. Stock se restaura y puntos se revierten."
+          }
+        },
+        {
+          "name": "Ver stock restaurado post-cancelación",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/stocks/producto/{{producto_id_1}}",
+            "description": "Verificar que el stock volvió al valor original."
+          }
+        },
+        {
+          "name": "Ver puntos revertidos post-cancelación",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/usuarios/{{usuario_id}}/puntos",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
+            "description": "Verificar que los puntos generados por la compra fueron restados."
+          }
+        }
+      ]
+    }
+  ]
+}
