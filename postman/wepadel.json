@@ -547,7 +547,7 @@
             "method": "PUT",
             "url": "{{base_url}}/usuarios/{{usuario_id}}/ordenes/{{orden_id}}/cancelar",
             "header": [{ "key": "Authorization", "value": "Bearer {{token_cliente}}" }],
-            "description": "Cancelar la orden. Stock se restaura y puntos se revierten."
+            "description": "Cancelar la orden. Stock se restaura; se descuentan del saldo los puntos generados por esa orden sin bajar el saldo de cero. Los puntos usados como descuento no se devuelven."
           }
         },
         {

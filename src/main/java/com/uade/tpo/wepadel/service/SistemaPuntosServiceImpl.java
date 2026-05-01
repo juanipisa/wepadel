@@ -69,11 +69,17 @@ public class SistemaPuntosServiceImpl implements SistemaPuntosService {
         });
     }
 
+    /**
+     * Resta puntos del saldo (p. ej. al cancelar una orden). El saldo no baja de cero:
+     * si ya gastó parte de los puntos generados, solo se descuenta hasta agotar el saldo actual.
+     */
     public Optional<SistemaPuntos> ajustarPuntos(Long usuarioId, int puntosARestar) {
         if (puntosARestar < 0)
             throw new PuntosNegativosException();
         return sistemaPuntosRepository.findByUsuarioId(usuarioId).map(sistema -> {
-            sistema.setCantidad(sistema.getCantidad() - puntosARestar);
+            int actual = sistema.getCantidad();
+            int nuevo = Math.max(0, actual - puntosARestar);
+            sistema.setCantidad(nuevo);
             return sistemaPuntosRepository.save(sistema);
         });
     }
