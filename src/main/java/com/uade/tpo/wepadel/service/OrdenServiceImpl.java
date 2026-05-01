@@ -148,10 +148,7 @@ public class OrdenServiceImpl implements OrdenService {
         if (orden.getPuntosGenerados() > 0) {
             sistemaPuntosService.ajustarPuntos(uid, orden.getPuntosGenerados());
         }
-        if (orden.getPuntosUsados() > 0) {
-            sistemaPuntosService.sumarPuntos(uid, orden.getPuntosUsados());
-        }
-    
+
         return Optional.of(orden);
     }
 

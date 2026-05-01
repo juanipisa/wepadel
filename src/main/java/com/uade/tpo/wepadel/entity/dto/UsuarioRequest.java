@@ -11,6 +11,7 @@ public class UsuarioRequest {
     @Size(min = 2, message = "El nombre y apellido debe tener al menos 2 caracteres")
     private String nombreApellido;
 
+    @Size(min = 1, message = "El mail no puede estar vacío")
     @Email(message = "El formato del mail no es válido")
     private String mail;
 
