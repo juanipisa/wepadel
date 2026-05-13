@@ -90,7 +90,7 @@ public class Orden {
     @Column(name = "puntos_generados", nullable = false)
     private int puntosGenerados = 0;
 
-    // Puntos del saldo que el usuario canjeó en esta compra (para devolverlos si cancela)
+    // Puntos del saldo que el usuario canjeó en esta compra (no se reintegran si cancela)
     @Column(name = "puntos_usados", nullable = false)
     private int puntosUsados = 0;
 
