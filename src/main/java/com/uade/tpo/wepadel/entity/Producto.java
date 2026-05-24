@@ -18,7 +18,8 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String descripcion, BigDecimal precio, CategoriaEnum categoria) {
+    public Producto(String nombre, String descripcion, BigDecimal precio, CategoriaEnum categoria) {
+        this.nombre = nombre;
         this.descripcion = descripcion;
         this.precio = precio;
         this.categoria = categoria;
@@ -28,6 +29,9 @@ public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "nombre", nullable = false)
+    private String nombre;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "categoria", nullable = false)
