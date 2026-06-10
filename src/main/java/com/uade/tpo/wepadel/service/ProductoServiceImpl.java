@@ -36,7 +36,7 @@ public class ProductoServiceImpl implements ProductoService {
     public Producto createProducto(ProductoRequest request) {
 
         Producto producto = productoRepository.save(
-                new Producto(request.getDescripcion(), request.getPrecio(), request.getCategoria())
+                new Producto(request.getNombre(), request.getDescripcion(), request.getPrecio(), request.getCategoria())
         );
 
         // Inicializar stock en cero automáticamente al crear el producto
@@ -54,6 +54,13 @@ public class ProductoServiceImpl implements ProductoService {
                 throw new ProductoInvalidoException("La descripción no puede estar vacía");
             }
             producto.setDescripcion(request.getDescripcion());
+        }
+
+        if (request.getNombre() != null) {
+            if (request.getNombre().isBlank()) {
+                throw new ProductoInvalidoException("El nombre no puede estar vacío");
+            }
+            producto.setNombre(request.getNombre());
         }
 
         if (request.getPrecio() != null) {

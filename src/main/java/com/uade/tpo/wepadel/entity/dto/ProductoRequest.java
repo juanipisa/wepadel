@@ -9,6 +9,9 @@ import jakarta.validation.constraints.NotNull;
 @Data
 public class ProductoRequest {
     @NotBlank
+    private String nombre;
+
+    @NotBlank
     private String descripcion;
 
     @NotNull
