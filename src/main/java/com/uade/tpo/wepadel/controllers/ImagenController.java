@@ -8,11 +8,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
+import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
 import com.uade.tpo.wepadel.service.ImagenService;
 
 import jakarta.validation.Valid;
@@ -35,6 +37,13 @@ public class ImagenController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .location(URI.create("/imagenes/" + id))
                 .build();
+    }
+
+    @PutMapping("/{imagenId}")
+    public ResponseEntity<Void> updateImagen(@PathVariable Long imagenId,
+            @Valid UpdateImagenRequest request) {
+        imagenService.updateImagen(imagenId, request);
+        return ResponseEntity.noContent().build();
     }
 
 }

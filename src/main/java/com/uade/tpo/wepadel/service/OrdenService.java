@@ -7,6 +7,7 @@ import com.uade.tpo.wepadel.entity.Orden;
 import com.uade.tpo.wepadel.entity.dto.OrdenRequest;
 
 public interface OrdenService {
+    public List<Orden> getAllOrdenes();
     public Optional<Orden> getOrdenById(Long ordenId);
     public List<Orden> getOrdenesByUsuarioId(Long usuarioId);
     public Orden createOrden(OrdenRequest request);

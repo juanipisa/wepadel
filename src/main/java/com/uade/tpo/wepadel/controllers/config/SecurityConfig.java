@@ -51,9 +51,10 @@ public class SecurityConfig {
               .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ADMINISTRADOR")
               .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("ADMINISTRADOR")
               
-              // Imágenes — lectura pública, subida solo ADMIN
+              // Imágenes — lectura pública, gestión solo ADMIN
               .requestMatchers(HttpMethod.GET, "/imagenes/**").permitAll()
               .requestMatchers(HttpMethod.POST, "/imagenes/**").hasAuthority("ADMINISTRADOR")
+              .requestMatchers(HttpMethod.PUT, "/imagenes/**").hasAuthority("ADMINISTRADOR")
   
               // Descuentos — lectura pública, gestión solo ADMIN
               .requestMatchers(HttpMethod.GET, "/descuentos/**").permitAll()

@@ -14,4 +14,6 @@ public interface ImagenRepository extends JpaRepository<Imagen, Long> {
 
     void deleteByProductoId(Long productoId);
 
+    void deleteByProductoIdAndIdNot(Long productoId, Long id);
+
 }

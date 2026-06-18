@@ -8,6 +8,7 @@ import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
 
 public interface ProductoService {
     List<Producto> getProductos();
+    List<Producto> getAllProductos();
     Producto getProductoById(Long productoId);
     Producto createProducto(ProductoRequest request);
     Optional<Producto> updateProducto(Long productoId, ProductoRequest request);

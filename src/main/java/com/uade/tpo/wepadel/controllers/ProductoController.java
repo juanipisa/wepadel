@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,8 +35,18 @@ public class ProductoController {
     private ImagenService imagenService;
 
     @GetMapping
-    public ResponseEntity<List<Producto>> getProductos() {
-        return ResponseEntity.ok(productoService.getProductos());
+    public ResponseEntity<List<Producto>> getProductos(Authentication authentication) {
+        boolean isAdmin = authentication != null
+                && authentication.isAuthenticated()
+                && authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .anyMatch("ADMINISTRADOR"::equals);
+
+        List<Producto> productos = isAdmin
+                ? productoService.getAllProductos()
+                : productoService.getProductos();
+
+        return ResponseEntity.ok(productos);
     }
 
     @GetMapping("/{productoId}")

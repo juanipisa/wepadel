@@ -46,6 +46,10 @@ public class ProductoServiceImpl implements ProductoService {
         return productoRepository.findByEstaHabilitadoTrue();
     }
 
+    public List<Producto> getAllProductos() {
+        return productoRepository.findAll();
+    }
+
     public Producto getProductoById(Long productoId) {
         return productoRepository.findById(productoId)
                 .orElseThrow(ProductoNotFoundException::new);
