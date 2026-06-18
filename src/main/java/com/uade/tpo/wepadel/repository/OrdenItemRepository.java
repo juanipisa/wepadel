@@ -10,4 +10,5 @@ import com.uade.tpo.wepadel.entity.OrdenItem;
 @Repository
 public interface OrdenItemRepository extends JpaRepository<OrdenItem, Long> {
     List<OrdenItem> findByOrdenId(Long ordenId);
+    boolean existsByProductoId(Long productoId);
 }

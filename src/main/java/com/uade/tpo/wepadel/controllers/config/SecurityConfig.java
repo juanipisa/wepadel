@@ -49,6 +49,7 @@ public class SecurityConfig {
               .requestMatchers(HttpMethod.GET, "/productos/**").permitAll()
               .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("ADMINISTRADOR")
               .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ADMINISTRADOR")
+              .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("ADMINISTRADOR")
               
               // Imágenes — lectura pública, subida solo ADMIN
               .requestMatchers(HttpMethod.GET, "/imagenes/**").permitAll()
@@ -68,6 +69,9 @@ public class SecurityConfig {
               .requestMatchers(HttpMethod.GET, "/usuarios/**").hasAnyAuthority("ADMINISTRADOR", "CLIENTE")
               .requestMatchers(HttpMethod.PUT, "/usuarios/**").hasAnyAuthority("ADMINISTRADOR", "CLIENTE")
   
+              // Listado global de órdenes — solo ADMIN
+              .requestMatchers(HttpMethod.GET, "/ordenes/**").hasAuthority("ADMINISTRADOR")
+
               // Carrito, Órdenes y Puntos — solo CLIENTE
               .requestMatchers("/usuarios/*/carrito/**").hasAuthority("CLIENTE")
               .requestMatchers("/usuarios/*/ordenes/**").hasAuthority("CLIENTE")

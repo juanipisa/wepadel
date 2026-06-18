@@ -6,12 +6,18 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.Stock;
 import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
 import com.uade.tpo.wepadel.exceptions.ProductoInvalidoException;
 import com.uade.tpo.wepadel.exceptions.ProductoNotFoundException;
+import com.uade.tpo.wepadel.exceptions.ProductoReferenciadoException;
+import com.uade.tpo.wepadel.repository.CarritoItemRepository;
+import com.uade.tpo.wepadel.repository.DescuentoRepository;
+import com.uade.tpo.wepadel.repository.ImagenRepository;
+import com.uade.tpo.wepadel.repository.OrdenItemRepository;
 import com.uade.tpo.wepadel.repository.ProductoRepository;
 import com.uade.tpo.wepadel.repository.StockRepository;
 
@@ -23,6 +29,18 @@ public class ProductoServiceImpl implements ProductoService {
 
     @Autowired
     private StockRepository stockRepository;
+
+    @Autowired
+    private OrdenItemRepository ordenItemRepository;
+
+    @Autowired
+    private CarritoItemRepository carritoItemRepository;
+
+    @Autowired
+    private DescuentoRepository descuentoRepository;
+
+    @Autowired
+    private ImagenRepository imagenRepository;
 
     public List<Producto> getProductos() {
         return productoRepository.findByEstaHabilitadoTrue();
@@ -75,6 +93,28 @@ public class ProductoServiceImpl implements ProductoService {
         }
 
         return Optional.of(productoRepository.save(producto));
+    }
+
+    // Borrado físico: solo si el producto no está referenciado en ninguna orden.
+    // Las referencias "vivas" (carrito, descuentos, imágenes, stock) se limpian antes de borrar.
+    @Transactional
+    public Producto deleteProducto(Long productoId) {
+        Producto producto = productoRepository.findById(productoId)
+                .orElseThrow(ProductoNotFoundException::new);
+
+        if (ordenItemRepository.existsByProductoId(productoId)) {
+            throw new ProductoReferenciadoException(
+                    "No se puede eliminar el producto porque está asociado a una o más órdenes");
+        }
+
+        carritoItemRepository.deleteByProductoId(productoId);
+        descuentoRepository.deleteByProductoId(productoId);
+        imagenRepository.deleteByProductoId(productoId);
+        stockRepository.deleteByProductoId(productoId);
+
+        productoRepository.delete(producto);
+
+        return producto;
     }
 
 }

@@ -91,6 +91,11 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.BAD_REQUEST, "El producto no está disponible para la venta");
     }
 
+    @ExceptionHandler(ProductoReferenciadoException.class)
+    public ResponseEntity<Object> handleProductoReferenciado(ProductoReferenciadoException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
     @ExceptionHandler(StockInsuficienteException.class)
     public ResponseEntity<Object> handleStockInsuficiente(StockInsuficienteException ex) {
         return buildResponse(HttpStatus.BAD_REQUEST, "Stock insuficiente para la cantidad solicitada");

@@ -11,4 +11,5 @@ public interface ProductoService {
     Producto getProductoById(Long productoId);
     Producto createProducto(ProductoRequest request);
     Optional<Producto> updateProducto(Long productoId, ProductoRequest request);
+    Producto deleteProducto(Long productoId);
 }

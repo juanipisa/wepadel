@@ -11,4 +11,5 @@ import com.uade.tpo.wepadel.entity.CarritoItem;
 @Repository
 public interface CarritoItemRepository extends JpaRepository<CarritoItem, Long> {
     List<CarritoItem> findByCarrito(Carrito carrito);
+    void deleteByProductoId(Long productoId);
 }

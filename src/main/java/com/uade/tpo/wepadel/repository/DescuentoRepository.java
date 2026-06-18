@@ -11,4 +11,5 @@ import com.uade.tpo.wepadel.entity.Descuento;
 public interface DescuentoRepository extends JpaRepository<Descuento, Long> {
 
     List<Descuento> findByProductoId(Long productoId);
+    void deleteByProductoId(Long productoId);
 }

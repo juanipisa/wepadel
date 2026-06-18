@@ -10,4 +10,5 @@ import com.uade.tpo.wepadel.entity.Stock;
 @Repository
 public interface StockRepository extends JpaRepository<Stock, Long> {
     Optional<Stock> findByProductoId(Long productoId);
+    void deleteByProductoId(Long productoId);
 }

@@ -59,6 +59,10 @@ public class OrdenServiceImpl implements OrdenService {
     @Autowired
     private SistemaPuntosService sistemaPuntosService;
 
+    public List<Orden> getAllOrdenes() {
+        return ordenRepository.findAll();
+    }
+
     public Optional<Orden> getOrdenById(Long ordenId) {
         return ordenRepository.findById(ordenId);
     }
