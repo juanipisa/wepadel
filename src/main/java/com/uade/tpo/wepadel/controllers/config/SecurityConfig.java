@@ -50,6 +50,9 @@ public class SecurityConfig {
               .requestMatchers(HttpMethod.POST, "/productos/**").hasAuthority("ADMINISTRADOR")
               .requestMatchers(HttpMethod.PUT, "/productos/**").hasAuthority("ADMINISTRADOR")
               .requestMatchers(HttpMethod.DELETE, "/productos/**").hasAuthority("ADMINISTRADOR")
+
+              // Categorías — lectura pública (derivadas del CategoriaEnum)
+              .requestMatchers(HttpMethod.GET, "/categorias/**").permitAll()
               
               // Imágenes — lectura pública, gestión solo ADMIN
               .requestMatchers(HttpMethod.GET, "/imagenes/**").permitAll()
