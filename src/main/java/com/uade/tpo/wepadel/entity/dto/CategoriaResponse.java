@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CategoriaResponse {
 
-    private String valor;
-    private String slug;
-    private ImagenResponse portada;
+    private String id;
+    private String label;
+    private String img;
+    private String path;
 
 }

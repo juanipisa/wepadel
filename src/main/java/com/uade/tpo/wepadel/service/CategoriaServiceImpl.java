@@ -1,8 +1,8 @@
 package com.uade.tpo.wepadel.service;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -11,9 +11,9 @@ import com.uade.tpo.wepadel.entity.CategoriaEnum;
 import com.uade.tpo.wepadel.entity.Imagen;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.CategoriaResponse;
-import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.repository.ImagenRepository;
 import com.uade.tpo.wepadel.repository.ProductoRepository;
+import com.uade.tpo.wepadel.util.ImagenDataUrlUtil;
 
 @Service
 public class CategoriaServiceImpl implements CategoriaService {
@@ -32,14 +32,21 @@ public class CategoriaServiceImpl implements CategoriaService {
     }
 
     private CategoriaResponse toResponse(CategoriaEnum categoria) {
+        String id = categoria.name().toLowerCase(Locale.ROOT);
+
         return CategoriaResponse.builder()
-                .valor(categoria.name())
-                .slug(categoria.name().toLowerCase())
-                .portada(resolverPortada(categoria))
+                .id(id)
+                .label(categoria.name())
+                .img(resolverPortada(categoria))
+                .path(resolverPath(id))
                 .build();
     }
 
-    private ImagenResponse resolverPortada(CategoriaEnum categoria) {
+    private String resolverPath(String id) {
+        return "/catalogo/" + id;
+    }
+
+    private String resolverPortada(CategoriaEnum categoria) {
         List<Producto> productos = productoRepository
                 .findByCategoriaAndEstaHabilitadoTrueOrderByIdAsc(categoria);
 
@@ -49,17 +56,10 @@ public class CategoriaServiceImpl implements CategoriaService {
                 continue;
             }
 
-            Imagen imagen = imagenes.get(0);
-            byte[] contenido = imagen.getContenido();
-            if (contenido == null || contenido.length == 0) {
-                continue;
+            String dataUrl = ImagenDataUrlUtil.toDataUrl(imagenes.get(0));
+            if (dataUrl != null) {
+                return dataUrl;
             }
-
-            return ImagenResponse.builder()
-                    .id(imagen.getId())
-                    .nombre(imagen.getNombre())
-                    .archivoBase64(Base64.getEncoder().encodeToString(contenido))
-                    .build();
         }
 
         return null;
