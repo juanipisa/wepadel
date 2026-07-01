@@ -3,7 +3,10 @@ package com.uade.tpo.wepadel.controllers;
 import java.net.URI;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
+import com.uade.tpo.wepadel.entity.dto.ImagenArchivo;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
 import com.uade.tpo.wepadel.service.ImagenService;
@@ -29,6 +33,18 @@ public class ImagenController {
     @GetMapping("/{imagenId}")
     public ResponseEntity<ImagenResponse> getImagenById(@PathVariable Long imagenId) {
         return ResponseEntity.ok(imagenService.getImagenById(imagenId));
+    }
+
+    @GetMapping("/{imagenId}/archivo")
+    public ResponseEntity<byte[]> getImagenArchivo(@PathVariable Long imagenId) {
+        ImagenArchivo archivo = imagenService.getImagenArchivo(imagenId);
+        ContentDisposition disposition = ContentDisposition.inline()
+                .filename(archivo.nombre())
+                .build();
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(archivo.contentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
+                .body(archivo.contenido());
     }
 
     @PostMapping

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
+import com.uade.tpo.wepadel.entity.dto.ProductoEnrichedResponse;
 import com.uade.tpo.wepadel.entity.dto.ProductoRequest;
 import com.uade.tpo.wepadel.service.ImagenService;
 import com.uade.tpo.wepadel.service.ProductoService;
@@ -34,19 +35,14 @@ public class ProductoController {
     @Autowired
     private ImagenService imagenService;
 
+    /**
+     * Lista productos con stock, imagen principal (URL) y descuentos.
+     * Público: solo habilitados. Admin autenticado: todos.
+     */
     @GetMapping
-    public ResponseEntity<List<Producto>> getProductos(Authentication authentication) {
-        boolean isAdmin = authentication != null
-                && authentication.isAuthenticated()
-                && authentication.getAuthorities().stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .anyMatch("ADMINISTRADOR"::equals);
-
-        List<Producto> productos = isAdmin
-                ? productoService.getAllProductos()
-                : productoService.getProductos();
-
-        return ResponseEntity.ok(productos);
+    public ResponseEntity<List<ProductoEnrichedResponse>> getProductos(Authentication authentication) {
+        boolean isAdmin = isAdministrador(authentication);
+        return ResponseEntity.ok(productoService.getProductosEnriched(isAdmin));
     }
 
     @GetMapping("/{productoId}")
@@ -59,7 +55,7 @@ public class ProductoController {
         Producto result = productoService.createProducto(request);
         return ResponseEntity.created(URI.create("/productos/" + result.getId())).body(result);
     }
-    
+
     @PutMapping("/{productoId}")
     public ResponseEntity<Producto> updateProducto(@PathVariable Long productoId, @RequestBody ProductoRequest request) {
         return productoService.updateProducto(productoId, request)
@@ -75,6 +71,14 @@ public class ProductoController {
     @GetMapping("/{productoId}/imagenes")
     public ResponseEntity<List<ImagenResponse>> getImagenesByProductoId(@PathVariable Long productoId) {
         return ResponseEntity.ok(imagenService.getImagenesByProductoId(productoId));
+    }
+
+    private static boolean isAdministrador(Authentication authentication) {
+        return authentication != null
+                && authentication.isAuthenticated()
+                && authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .anyMatch("ADMINISTRADOR"::equals);
     }
 
 }

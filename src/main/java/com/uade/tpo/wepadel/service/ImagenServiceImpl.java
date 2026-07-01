@@ -11,8 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.uade.tpo.wepadel.entity.Imagen;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
+import com.uade.tpo.wepadel.entity.dto.ImagenArchivo;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
+import com.uade.tpo.wepadel.util.ImagenContentTypeUtil;
 import com.uade.tpo.wepadel.exceptions.ImagenNotFoundException;
 import com.uade.tpo.wepadel.exceptions.ProductoInvalidoException;
 import com.uade.tpo.wepadel.exceptions.ProductoNotFoundException;
@@ -41,6 +43,16 @@ public class ImagenServiceImpl implements ImagenService {
                 .nombre(imagen.getNombre())
                 .archivoBase64(encodedString)
                 .build();
+    }
+
+    @Override
+    public ImagenArchivo getImagenArchivo(Long id) {
+        Imagen imagen = imagenRepository.findById(id).orElseThrow(ImagenNotFoundException::new);
+        byte[] bytes = imagen.getContenido();
+        if (bytes == null || bytes.length == 0) {
+            throw new ImagenNotFoundException();
+        }
+        return new ImagenArchivo(bytes, imagen.getNombre(), ImagenContentTypeUtil.fromNombre(imagen.getNombre()));
     }
 
     @Override
