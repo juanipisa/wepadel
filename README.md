@@ -49,6 +49,48 @@ mvnw.cmd spring-boot:run
 La API queda disponible en `http://localhost:8080`.  
 Las tablas se crean automáticamente (ddl-auto=update).
 
+### Listado de productos
+
+`GET /productos` devuelve cada producto con **stock**, **imagen principal (URL)** y **descuentos** en una sola respuesta liviana.
+
+- Sin token: solo productos con `estaHabilitado = true`.
+- Con token `ADMINISTRADOR`: todos los productos, incluidos deshabilitados.
+- Las imágenes del listado se referencian por URL relativa (`imagenPrincipal.url`), no por Base64.
+
+### Imágenes
+
+| Endpoint | Uso |
+|----------|-----|
+| `GET /imagenes/{id}/archivo` | Binario para `<img src="http://localhost:8080/imagenes/{id}/archivo">` |
+| `GET /imagenes/{id}` | JSON con `archivoBase64` |
+| `GET /productos/{id}/imagenes` | Lista con Base64 |
+
+### Crear / editar productos (flujo actual)
+
+| Endpoint | Formato |
+|----------|---------|
+| `POST /productos` | `application/json` → devuelve `Producto` básico |
+| `PUT /productos/{id}` | `application/json` → devuelve `Producto` básico |
+| `POST /imagenes` | `multipart/form-data` (productoId + archivo) |
+| `PUT /stocks/producto/{id}` | `application/json` `{ "cantidad": N }` |
+
+Ejemplo de item en `GET /productos`:
+
+```json
+{
+  "id": 1,
+  "nombre": "Paleta Pro",
+  "precio": 150000,
+  "stock": 12,
+  "imagenPrincipal": {
+    "id": 5,
+    "nombre": "foto.png",
+    "url": "/imagenes/5/archivo"
+  },
+  "descuentos": []
+}
+```
+
 ---
 
 ## Flujo rápido de prueba
