@@ -23,7 +23,7 @@ public class StockServiceImpl implements StockService {
     }
 
     public Stock updateStock(Long productoId, StockRequest request) {
-        if (request.getCantidad() < 0) {
+        if (request.getCantidad() == null || request.getCantidad() < 0) {
             throw new StockNegativoException();
         }
 

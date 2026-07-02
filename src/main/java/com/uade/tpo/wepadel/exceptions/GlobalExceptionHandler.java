@@ -142,7 +142,18 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-    public ResponseEntity<Object> handleJsonError(org.springframework.http.converter.HttpMessageNotReadableException ex) {
+    public ResponseEntity<Object> handleJsonError(
+            org.springframework.http.converter.HttpMessageNotReadableException ex) {
+        String detail = ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage()
+                : ex.getMessage();
+
+        if (detail != null && (detail.contains("out of range")
+                || detail.contains("Numeric value")
+                || detail.contains("not a valid `int`"))) {
+            return buildResponse(HttpStatus.BAD_REQUEST, "La cantidad de stock supera el máximo permitido");
+        }
+
         return buildResponse(HttpStatus.BAD_REQUEST, "Error en el formato del JSON o valor de enum inválido");
     }
 
@@ -233,6 +244,16 @@ public class GlobalExceptionHandler {
             return "La fecha de fin es obligatoria";
         }
         
+        if ("cantidad".equals(field) && matchesConstraint(fe, "Min")) {
+            return "La cantidad no puede ser negativa";
+        }
+        if ("cantidad".equals(field) && matchesConstraint(fe, "Max")) {
+            return "La cantidad de stock supera el máximo permitido";
+        }
+        if ("cantidad".equals(field) && matchesConstraint(fe, "NotNull")) {
+            return "La cantidad de stock es obligatoria";
+        }
+
         // CarritoItemRequest
         if ("productoId".equals(field) && matchesConstraint(fe, "NotNull")) {
             return "El producto es obligatorio";

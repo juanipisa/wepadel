@@ -13,6 +13,8 @@ import com.uade.tpo.wepadel.entity.Stock;
 import com.uade.tpo.wepadel.entity.dto.StockRequest;
 import com.uade.tpo.wepadel.service.StockService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("stocks")
 public class StockController {
@@ -26,7 +28,9 @@ public class StockController {
     }
 
     @PutMapping("/producto/{productoId}")
-    public ResponseEntity<Stock> updateStock(@PathVariable Long productoId, @RequestBody StockRequest request) {
+    public ResponseEntity<Stock> updateStock(
+            @PathVariable Long productoId,
+            @Valid @RequestBody StockRequest request) {
         return ResponseEntity.ok(stockService.updateStock(productoId, request));
     }
 
