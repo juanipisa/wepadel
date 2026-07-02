@@ -29,4 +29,16 @@ public class AuthenticationController {
       @Valid @RequestBody AuthenticationRequest request) {
     return ResponseEntity.ok(service.authenticate(request));
   }
+
+  @PostMapping("/forgot-password")
+  public ResponseEntity<ForgotPasswordResponse> forgotPassword(
+      @Valid @RequestBody ForgotPasswordRequest request) {
+    return ResponseEntity.ok(service.forgotPassword(request));
+  }
+
+  @PostMapping("/reset-password")
+  public ResponseEntity<MessageResponse> resetPassword(
+      @Valid @RequestBody ResetPasswordRequest request) {
+    return ResponseEntity.ok(service.resetPassword(request));
+  }
 }
