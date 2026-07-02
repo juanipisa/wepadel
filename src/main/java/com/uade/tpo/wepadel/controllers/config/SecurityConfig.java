@@ -63,7 +63,8 @@ public class SecurityConfig {
               .requestMatchers(HttpMethod.GET, "/descuentos/**").permitAll()
               .requestMatchers(HttpMethod.POST, "/descuentos/**").hasAuthority("ADMINISTRADOR")
               .requestMatchers(HttpMethod.DELETE, "/descuentos/**").hasAuthority("ADMINISTRADOR")
-  
+              .requestMatchers(HttpMethod.PUT, "/descuentos/**").hasAuthority("ADMINISTRADOR")
+              
               // Stocks — lectura pública, actualización solo ADMIN
               .requestMatchers(HttpMethod.GET, "/stocks/**").permitAll()
               .requestMatchers(HttpMethod.PUT, "/stocks/**").hasAuthority("ADMINISTRADOR")
