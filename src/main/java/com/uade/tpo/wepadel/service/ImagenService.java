@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
 import com.uade.tpo.wepadel.entity.dto.ImagenArchivo;
+import com.uade.tpo.wepadel.entity.dto.ImagenCatalogoResponse;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
 
@@ -19,9 +20,9 @@ public interface ImagenService {
         return URL_ARCHIVO_PREFIX + imagenId + "/archivo";
     }
 
-    Long createImagen(AddImagenRequest request);
+    ImagenCatalogoResponse createImagen(AddImagenRequest request);
 
-    void updateImagen(Long imagenId, UpdateImagenRequest request);
+    ImagenCatalogoResponse updateImagen(Long imagenId, UpdateImagenRequest request);
 
     List<ImagenResponse> getImagenesByProductoId(Long productoId);
 }

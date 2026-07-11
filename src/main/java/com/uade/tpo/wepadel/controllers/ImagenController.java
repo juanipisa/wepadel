@@ -1,7 +1,5 @@
 package com.uade.tpo.wepadel.controllers;
 
-import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
 import com.uade.tpo.wepadel.entity.dto.ImagenArchivo;
+import com.uade.tpo.wepadel.entity.dto.ImagenCatalogoResponse;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
 import com.uade.tpo.wepadel.service.ImagenService;
@@ -48,18 +47,15 @@ public class ImagenController {
     }
 
     @PostMapping
-    public ResponseEntity<Void> createImagen(@Valid AddImagenRequest request) {
-        Long id = imagenService.createImagen(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .location(URI.create("/imagenes/" + id))
-                .build();
+    public ResponseEntity<ImagenCatalogoResponse> createImagen(@Valid AddImagenRequest request) {
+        ImagenCatalogoResponse created = imagenService.createImagen(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{imagenId}")
-    public ResponseEntity<Void> updateImagen(@PathVariable Long imagenId,
+    public ResponseEntity<ImagenCatalogoResponse> updateImagen(@PathVariable Long imagenId,
             @Valid UpdateImagenRequest request) {
-        imagenService.updateImagen(imagenId, request);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(imagenService.updateImagen(imagenId, request));
     }
 
 }

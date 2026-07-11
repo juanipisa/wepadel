@@ -12,6 +12,7 @@ import com.uade.tpo.wepadel.entity.Imagen;
 import com.uade.tpo.wepadel.entity.Producto;
 import com.uade.tpo.wepadel.entity.dto.AddImagenRequest;
 import com.uade.tpo.wepadel.entity.dto.ImagenArchivo;
+import com.uade.tpo.wepadel.entity.dto.ImagenCatalogoResponse;
 import com.uade.tpo.wepadel.entity.dto.ImagenResponse;
 import com.uade.tpo.wepadel.entity.dto.UpdateImagenRequest;
 import com.uade.tpo.wepadel.util.ImagenContentTypeUtil;
@@ -56,7 +57,7 @@ public class ImagenServiceImpl implements ImagenService {
     }
 
     @Override
-    public Long createImagen(AddImagenRequest request) {
+    public ImagenCatalogoResponse createImagen(AddImagenRequest request) {
         if (request.getProductoId() == null) {
             throw new ProductoInvalidoException("Falta el productoId");
         }   
@@ -80,11 +81,15 @@ public class ImagenServiceImpl implements ImagenService {
 
         String nombre = nombreDesdeArchivo(archivo);
         Imagen guardada = imagenRepository.save(new Imagen(producto, bytes, nombre));
-        return guardada.getId();
+        return ImagenCatalogoResponse.builder()
+                .id(guardada.getId())
+                .nombre(guardada.getNombre())
+                .url(ImagenService.urlArchivo(guardada.getId()))
+                .build();
     }
 
     @Override
-    public void updateImagen(Long imagenId, UpdateImagenRequest request) {
+    public ImagenCatalogoResponse updateImagen(Long imagenId, UpdateImagenRequest request) {
         Imagen imagen = imagenRepository.findById(imagenId)
                 .orElseThrow(ImagenNotFoundException::new);
 
@@ -106,6 +111,12 @@ public class ImagenServiceImpl implements ImagenService {
 
         Long productoId = imagen.getProducto().getId();
         imagenRepository.deleteByProductoIdAndIdNot(productoId, imagenId);
+
+        return ImagenCatalogoResponse.builder()
+                .id(imagen.getId())
+                .nombre(imagen.getNombre())
+                .url(ImagenService.urlArchivo(imagen.getId()))
+                .build();
     }
 
     @Override
